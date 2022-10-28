@@ -1,6 +1,7 @@
 import { Atkinson_Hyperlegible } from "@next/font/google";
 import Header from "../components/header";
 import "tailwindcss/tailwind.css";
+import "highlight.js/styles/github-dark.css";
 
 const atkinsonHyperlegible = Atkinson_Hyperlegible({
   weight: "400",
