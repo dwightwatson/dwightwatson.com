@@ -3,7 +3,7 @@ import me from "../public/dwight-watson.jpg";
 
 export default function Bio() {
   return (
-    <div className="border border-gray-100 rounded-md overflow-hidden mb-5 shadow-xs">
+    <div className="border border-gray-300 rounded-md mb-8">
       <div className="flex justify-between items-center gap-5 p-4">
         <p>
           A blog about Laravel & Rails by Dwight Watson;
@@ -55,7 +55,7 @@ export default function Bio() {
         />
       </div>
 
-      <div className="bg-gray-50 text-xs p-4">
+      <div className="border-t border-gray-100 text-xs p-4">
         <p>
           Follow me on{" "}
           <a

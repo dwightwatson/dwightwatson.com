@@ -17,7 +17,7 @@ export default function Home() {
     <div>
       <Bio />
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8 mb-8">
         {posts.map((post) => (
           <Post key={post.slug} post={post} />
         ))}

@@ -4,7 +4,7 @@ import { useMDXComponent } from "next-contentlayer/hooks";
 
 const components = {
   a: ({ href, children }) => <Link href={href}>{children}</Link>,
-  pre: (props) => <Code theme={"github-dark"} {...props} />,
+  pre: (props) => <Code theme={"one-dark-pro"} {...props} />,
 };
 
 interface MdxProps {

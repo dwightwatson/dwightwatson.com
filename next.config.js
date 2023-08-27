@@ -73,10 +73,3 @@ const nextConfig = {
 };
 
 module.exports = withContentlayer(nextConfig);
-
-// module.exports = withMDX({
-//   experimental: {
-//     appDir: true,
-//     mdxRs: true,
-//   },
-// });

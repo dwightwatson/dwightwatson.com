@@ -50,7 +50,7 @@ export default async function Page({ params }) {
         <small>{tagHeader}</small>
       </div>
 
-      <div className="flex flex-col gap-6 mb-8">
+      <div className="flex flex-col gap-8 mb-8">
         {posts.map((post) => (
           <Post key={post.slug} post={post} />
         ))}
