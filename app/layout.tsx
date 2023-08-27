@@ -36,8 +36,6 @@ export default function RootLayout({
           gtag('config', 'G-E6YFFSYMLD');
         `}
         </Script>
-
-        <title>All posts</title>
       </head>
       <body className="font-sans">
         <div className="border-t-4 border-blue-600 selection:bg-blue-600 selection:text-white">
