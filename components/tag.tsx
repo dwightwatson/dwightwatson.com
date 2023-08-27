@@ -5,7 +5,7 @@ export default function Tag({ tag }) {
   return (
     <Link
       href={`/tags/${kebabCase(tag)}`}
-      className="underline text-sm text-gray-700"
+      className="underline text-sm text-gray-500"
     >
       #{kebabCase(tag)}
     </Link>
