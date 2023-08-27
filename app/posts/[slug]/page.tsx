@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { allPosts } from "contentlayer/generated";
 
-import Bio from "../../../components/bio";
-import Tags from "../../../components/tags";
-import Date from "../../../components/date";
-import Mdx from "../../../components/mdx";
+import Bio from "@/components/bio";
+import Tags from "@/components/tags";
+import Date from "@/components/date";
+import Mdx from "@/components/mdx";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {

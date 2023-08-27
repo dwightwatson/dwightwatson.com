@@ -15,8 +15,8 @@ export default function Header() {
   );
 
   if (pathname === "/") {
-    return <h1 className="text-2xl">{link}</h1>;
+    return <h1 className="font-serif text-2xl">{link}</h1>;
   }
 
-  return <h3 className="text-xl">{link}</h3>;
+  return <h3 className="font-serif text-xl">{link}</h3>;
 }

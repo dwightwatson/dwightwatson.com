@@ -1,5 +1,5 @@
 import { Atkinson_Hyperlegible, League_Spartan } from "next/font/google";
-import Header from "../components/header";
+import Header from "@/components/header";
 import Script from "next/script";
 import "tailwindcss/tailwind.css";
 
@@ -26,6 +26,8 @@ export default function RootLayout({
       className={`${atkinsonHyperlegible.variable} ${leagueSpartan.variable} bg-white text-black}`}
     >
       <head>
+        <link rel="icon" href="/tsunami.png" type="image/png" />
+
         <Script src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID" />
         <Script id="google-analytics">
           {`

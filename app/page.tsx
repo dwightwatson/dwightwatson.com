@@ -1,5 +1,5 @@
-import Bio from "../components/bio";
-import Post from "../components/post";
+import Bio from "@/components/bio";
+import Post from "@/components/post";
 import { compareDesc } from "date-fns";
 import { allPosts } from "contentlayer/generated";
 

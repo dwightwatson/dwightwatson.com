@@ -1,8 +1,9 @@
 import { allPosts } from "contentlayer/generated";
-import Bio from "../../../components/bio";
-import Post from "../../../components/post";
+import Bio from "@/components/bio";
+import Post from "@/components/post";
 import { kebabCase } from "lodash";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 export async function generateStaticParams() {
   const tags = allPosts
@@ -17,8 +18,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }) {
-  const tag = params.tag;
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const tag = params.slug;
 
   if (!tag) {
     return;
@@ -49,11 +50,11 @@ export default async function Page({ params }) {
         <small>{tagHeader}</small>
       </div>
 
-      <ul className="mb-8">
+      <div className="flex flex-col gap-6 mb-8">
         {posts.map((post) => (
-          <Post key={post.id} post={post} />
+          <Post key={post.slug} post={post} />
         ))}
-      </ul>
+      </div>
 
       <Bio />
     </>
