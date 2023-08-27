@@ -31,7 +31,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   };
 }
 
-export default async function Page({ params }) {
+export default function Page({ params }) {
   const tag = params.slug;
   const posts = allPosts.filter((post) =>
     post.tags?.map((tag) => kebabCase(tag)).includes(tag)
