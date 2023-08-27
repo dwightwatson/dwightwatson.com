@@ -35,7 +35,7 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: `/posts/xcode-command-line-tools-on-mac-os-x-10-9-(mavericks)`,
+        source: `/posts/xcode-command-line-tools-on-mac-os-x-10-9-\\(mavericks\\)`,
         destination:
           "/posts/xcode-command-line-tools-on-mac-os-x-10-9-mavericks",
         permanent: true,

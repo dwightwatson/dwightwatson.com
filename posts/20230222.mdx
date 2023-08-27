@@ -18,14 +18,14 @@ error:0A000086:SSL routines::certificate verify failed
 In `config/database.php` under the `redis` key you can control the options for your Redis connection. Here you can add a `context` which sets `verify_peer` and `verify_peer_name` to `false` so that the certificate issues are ignored. In the code below I've only applied these options in the production environment as it's not a concern for my local environment.
 
 ```php
-    'options' => [
-        'cluster' => env('REDIS_CLUSTER', 'redis'),
-        'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
-        'context' => env('APP_ENV') === 'production' ? [
-            'stream' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-            ],
-        ] : [],
-    ],
+'options' => [
+    'cluster' => env('REDIS_CLUSTER', 'redis'),
+    'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+    'context' => env('APP_ENV') === 'production' ? [
+        'stream' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
+    ] : [],
+],
 ```
