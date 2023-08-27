@@ -2,12 +2,43 @@ import { allPosts } from "contentlayer/generated";
 import Bio from "../../../components/bio";
 import Post from "../../../components/post";
 import { kebabCase } from "lodash";
+import { notFound } from "next/navigation";
+
+export async function generateStaticParams() {
+  const tags = allPosts
+    .flatMap((post) => post.tags)
+    .filter((x) => x)
+    .map((tag) => kebabCase(tag));
+
+  const uniqueTags = new Set(tags);
+
+  return Array.from(uniqueTags).map((tag) => ({
+    slug: tag,
+  }));
+}
+
+export async function generateMetadata({ params }) {
+  const tag = params.tag;
+
+  if (!tag) {
+    return;
+  }
+
+  return {
+    title: tag,
+    description: `Posts tagged with ${tag}.`,
+  };
+}
 
 export default async function Page({ params }) {
   const tag = params.slug;
   const posts = allPosts.filter((post) =>
     post.tags?.map((tag) => kebabCase(tag)).includes(tag)
   );
+
+  if (posts.length === 0) {
+    notFound();
+  }
 
   const tagHeader = `${posts.length} post${posts.length === 1 ? "" : "s"}`;
 
@@ -27,17 +58,4 @@ export default async function Page({ params }) {
       <Bio />
     </>
   );
-}
-
-export async function generateStaticParams() {
-  const tags = allPosts
-    .flatMap((post) => post.tags)
-    .filter((x) => x)
-    .map((tag) => kebabCase(tag));
-
-  const uniqueTags = new Set(tags);
-
-  return Array.from(uniqueTags).map((tag) => ({
-    slug: tag,
-  }));
 }
