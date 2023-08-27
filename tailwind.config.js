@@ -11,6 +11,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ["var(--atkinson-hyperlegible)", defaultTheme.fontFamily.sans],
+        serif: ["var(--league-spartan)", defaultTheme.fontFamily.serif],
       },
     },
   },

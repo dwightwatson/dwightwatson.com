@@ -1,25 +1,24 @@
-import { getActualPostBySlug, getActualSlugs } from "../../../lib/api";
+import { allPosts } from "contentlayer/generated";
 import Bio from "../../../components/bio";
+import Post from "../../../components/post";
+import { kebabCase } from "lodash";
 
 export default async function Page({ params }) {
   const tag = params.slug;
-  const posts = getActualPostBySlug(params.slug, [
-    "title",
-    "date",
-    "content",
-    "tags",
-    "slug",
-  ]);
-  const tagHeader = `${totalCount} post${totalCount === 1 ? "" : "s"}`;
+  const posts = allPosts.filter((post) =>
+    post.tags?.map((tag) => kebabCase(tag)).includes(tag)
+  );
+
+  const tagHeader = `${posts.length} post${posts.length === 1 ? "" : "s"}`;
 
   return (
     <>
       <div className="mb-4">
-        <h1 className="text-2xl">#{tag}</h1>
+        <h1 className="font-serif text-2xl bread-words">#{tag}</h1>
         <small>{tagHeader}</small>
       </div>
 
-      <ul>
+      <ul className="mb-8">
         {posts.map((post) => (
           <Post key={post.id} post={post} />
         ))}
@@ -31,9 +30,14 @@ export default async function Page({ params }) {
 }
 
 export async function generateStaticParams() {
-  const slugs = getActualSlugs();
+  const tags = allPosts
+    .flatMap((post) => post.tags)
+    .filter((x) => x)
+    .map((tag) => kebabCase(tag));
 
-  return slugs.map((slug) => ({
-    slug,
+  const uniqueTags = new Set(tags);
+
+  return Array.from(uniqueTags).map((tag) => ({
+    slug: tag,
   }));
 }

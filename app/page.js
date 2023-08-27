@@ -1,17 +1,22 @@
 import Bio from "../components/bio";
 import Post from "../components/post";
-import { getAllPosts } from "../lib/api";
+import { compareDesc } from "date-fns";
+import { allPosts } from "contentlayer/generated";
 
-export default async function Home() {
-  const posts = await getAllPosts(["title", "date", "slug", "content"]);
+export default function Home() {
+  const posts = allPosts.sort((a, b) =>
+    compareDesc(new Date(a.date), new Date(b.date))
+  );
 
   return (
     <div>
       <Bio />
 
-      {posts.map((post) => (
-        <Post key={post.slug} post={post} />
-      ))}
+      <div className="flex flex-col gap-6">
+        {posts.map((post) => (
+          <Post key={post.slug} post={post} />
+        ))}
+      </div>
     </div>
   );
 }
