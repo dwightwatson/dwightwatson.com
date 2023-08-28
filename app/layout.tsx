@@ -10,7 +10,7 @@ const leagueSpartan = League_Spartan({
 });
 
 const atkinsonHyperlegible = Atkinson_Hyperlegible({
-  weight: "400",
+  weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--atkinson-hyperlegible",
 });

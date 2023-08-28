@@ -4,6 +4,7 @@ import { allPosts } from "contentlayer/generated";
 import Bio from "@/components/bio";
 import Tags from "@/components/tags";
 import Date from "@/components/date";
+import Outdated from "@/components/outdated";
 import Mdx from "@/components/mdx";
 import type { Metadata } from "next";
 
@@ -41,6 +42,8 @@ export default function Page({ params }) {
       </div>
 
       {post.tags?.length && <Tags tags={post.tags} className="mb-8" />}
+
+      <Outdated date={post.date} />
 
       <div className="prose md:prose-lg mb-8">
         <Mdx code={post.body.code} />
