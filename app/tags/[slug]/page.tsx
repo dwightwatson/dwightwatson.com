@@ -28,7 +28,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   }
 
   return {
-    title: tag,
+    title: `#${tag}`,
     description: `Posts tagged with ${tag}.`,
   };
 }
