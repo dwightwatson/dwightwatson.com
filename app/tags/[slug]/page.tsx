@@ -1,9 +1,11 @@
-import { allPosts } from "contentlayer/generated";
 import Bio from "@/components/bio";
 import Post from "@/components/post";
-import { kebabCase } from "lodash";
-import { notFound } from "next/navigation";
+
 import { Metadata } from "next";
+import { kebabCase } from "lodash";
+import { compareDesc } from "date-fns";
+import { notFound } from "next/navigation";
+import { allPosts } from "contentlayer/generated";
 
 export async function generateStaticParams() {
   const tags = allPosts
@@ -33,9 +35,9 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 export default function Page({ params }) {
   const tag = params.slug;
-  const posts = allPosts.filter((post) =>
-    post.tags?.map((tag) => kebabCase(tag)).includes(tag)
-  );
+  const posts = allPosts
+    .filter((post) => post.tags?.map((tag) => kebabCase(tag)).includes(tag))
+    .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
 
   if (posts.length === 0) {
     notFound();
