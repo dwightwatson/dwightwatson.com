@@ -12,7 +12,7 @@ const nextConfig = {
   redirects: async () => {
     return [
       {
-        source: `/posts/installing-composer-and-laravel-4-on-media-temple-(gs)`,
+        source: `/posts/installing-composer-and-laravel-4-on-media-temple-\\(gs\\)`,
         destination:
           "/posts/installing-composer-and-laravel-4-on-media-temple-gs",
         permanent: true,
