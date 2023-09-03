@@ -10,7 +10,7 @@ tags:
 
 I often see Homestead users just using the default `homestead` database that ships with a new Homestead box, rather than creating a new database specific to their application. When you're hosting multiple applications through your Homestead instance it makes a lot more sense to name your databases per-application, often with a `_testing` suffix for your test databses. It's actually really easy to add new databases inside your Homestead instance, and here are the instructions for both MySQL and PostgreSQL.
 
-# MySQL
+## MySQL
 
 ```
 // Login to MySQL (password is "secret")
@@ -23,7 +23,7 @@ CREATE DATABASE your_app_name;
 exit;
 ```
 
-# PostgreSQL
+## PostgreSQL
 
 ```
 // Login to PostgreSQL (password is "secret")

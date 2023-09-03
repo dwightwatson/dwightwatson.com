@@ -28,8 +28,8 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   }
 
   return {
-    title: `#${tag}`,
-    description: `Posts tagged with ${tag}.`,
+    title: `Posts tagged #${tag}`,
+    description: `The latest posts that have been tagged with #${tag}.`,
   };
 }
 

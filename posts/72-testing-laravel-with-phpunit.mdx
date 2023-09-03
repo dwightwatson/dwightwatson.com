@@ -14,7 +14,7 @@ For a while I've been debating the best way to test Laravel apps. From unit test
 
 [PHPUnit](https://phpunit.de/) is probably the de-facto PHP testing package, but it doesn't support integration testing. [PHPSpec](http://www.phpspec.net/) has a really refined way of doing unit testing, but there's no great way to functional test your Laravel controllers (you could unit test them, but eh). Finally [Codeception](http://codeception.com/) provides unit testing through PHPUnit, a really great integration testing library that supports Laravel, but the funtional testing is shot (I could go on about this, but functional and acceptance tests in Codeception hardly differ, it's stupid).
 
-# PHPUnit for Laravel models and controllers
+## PHPUnit for Laravel models and controllers
 
 At the moment I'm foregoing the use of integration testing, and simply testing my models and controllers through PHPUnit. One of the biggest problems I came across when getting into the testing of Laravel was the ability to look through an existing (real-world) codebase that was tested. It's for this reason, I've left [this very blog open-source](https://github.com/dwightwatson/neontsunami) so that people inteterested in learning to test Laravel with PHPUnit can have a browse through and learn from it.
 

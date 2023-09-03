@@ -11,7 +11,7 @@ tags:
 
 To kick off a new series on scaling Laravel on AWS I want to start with discussing Forge and the AWS platform. If you've been following Forge from the very beginning you might remember that it launched with support for AWS and Rackspace, however that was removed shortly after because those providers weren't playing as nice with the system as [Digital Ocean](https://www.digitalocean.com/) and [Linode](https://www.linode.com/). Luckily there is still the option to deploy Forge to any hosting provider with Ubuntu instances so it is still possible to get your apps running on AWS.
 
-# Why AWS?
+## Why AWS?
 
 I'm a big fan of the AWS ecosystem. Sure, you can get away with putting your sites on Digital Ocean and Linode - they're both great providers, and I also like that Linode provides Node Balancers. However beyond that it's up to you to get the rest of your architecture up and running. Want a MySQL instance, read the guides and set it up yourself. Want a caching or queueing service outside that provided by the Forge instance, do the same. Want to send emails or pop your assets behind a CDN? You're on your own.
 
@@ -21,7 +21,7 @@ The AWS ecosystem provides a heap of optimised, ready-to-go architecture which m
 
 Because so much amazing infrastructure is made available to your out of the box, you're left to simply configure your EC2 instaces to get your app serving. You know you can trust Amazon to get the rest right because they know a thing or two about hosting big sites.
 
-# Getting started (with terminology)
+## Getting started (with terminology)
 
 I'll admit, at first I was scared off by AWS. I thought "enterprise" or "that's for the big boys". I was intimidated by "security groups", "key pairs" and IAM. I spent a lot of time reading Linode and Digital Ocean guides to configure my own setups. It was a very educational and rewarding experience, and I now recommend to everyone I work with that they at least get their hands dirty getting some applications up and running from the bare metal. Knowing your way around the server is a very crucial component. However, though this worked, I realised I'd like to spend more time working on my apps and leave server management to someone else.
 
@@ -47,7 +47,7 @@ Key pairs belong to an IAM user account and are simply SSH keys that allow acces
 ssh ubuntu@127.0.0.1 -i ~/Sites/Dwights-MacBook-Pro.pem
 ```
 
-# What would I know
+## What would I know
 
 To be honest, I'm still very new to this. In case you don't normally follow my blog, I work on a number of high-traffic Laravel apps that get millions of hits a month, and get hit especially hard (10x the usual traffic) during peak periods twice a year. We've been using big powerful 24-core, 32GB RAM servers running cPanel for far too long and know it's time to move on. It doesn't make sense to keep expensive hardware around all year when it's only put to the test 4 months of the year, and it doesn't make sense to keep an app where performance matters running on PHP 5.4 with the dog that is cPanel (hey, it get's stuff done, but it isn't pretty).
 
@@ -55,6 +55,6 @@ I've spent the last month or so testing various ways to get Laravel running in t
 
 This series will roughly document the process by which we deploy and scale our high-traffic apps on the AWS cloud.
 
-# What's next?
+## What's next?
 
 In the next part of the series I will go into deploying Forge on AWS using the new "Custom VPS" provider from Forge. We'll go into setting up the proper security group and key pair for you to get Forge running on your EC2 instance and then how to SSH into it.

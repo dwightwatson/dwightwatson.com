@@ -12,7 +12,7 @@ Using Fractal with Laravel/Lumen
 
 I've recently discovered the immense joy of using [The PHP League's Fractal](http://fractal.thephpleague.com/) to generate responses for JSON APIs over hacking my Eloquent models from Laravel and Lumen to give me the output I want. Much like the ActiveModel Serializer for Rails this package gives you fine control over the exact output you give to clients, and more importantly it separates the logic for your JSON formation from your Eloquent model. Now that I've had the pleasure of developing sane APIs for a while I thought I'd document some of the ways I integrated Fractal with my Laravel and Lumen applications (it has to be done differently in Lumen as it doesn't support `Response` macros).
 
-# Custom serializers
+## Custom serializers
 
 First off, the Fractal supports a number of [serializers](http://fractal.thephpleague.com/serializers/) for generating a structure for your response. It will default to one called `DataArraySerializer` which effectively adds a root `data` key to your response, so if you're okay with that you can skip this step. If you'd like to use another serializer then you should register the `Manager` class with the IoC container, either in the `AppServiceProvider` or another one if you find it more appropriate. Note that at this stage the support for the `JSON-API` standard isn't yet complete.
 
@@ -30,7 +30,7 @@ public function register()
 }
 ```
 
-# Creating transformers
+## Creating transformers
 
 Next, you'll need to create some transformers - one for every type of Eloquent model you're going to want to output through the API. For this example I'll use a blog, where an `App\User` model has many `App\Post` models, and we want to return the user with their posts. I create a transformers directory inside my `Http` directory: `app/Http/Transformers` and then I can create two transformers; one for my `User` model and one for my `Post` model.
 
@@ -126,7 +126,7 @@ class PostTransformer extends TransformerAbstract
 
 _Note that you can also return `$this->collection` from within a transformer if you wanted to attach a collection rather than an item._
 
-# Generating responses in Laravel
+## Generating responses in Laravel
 
 With Laravel I would usually make a `FractalServiceProvider` that has the `register()` method I described earlier and would then register some response macros in the `boot()` method as you can see here. This adds two additional methods to Laravel's `Response` factory making it easy to return item or collection responses.
 
@@ -190,7 +190,7 @@ public function showPosts()
 
 If you need to use a different HTTP response status, like `201` for created or `204` for no content, then you can easily pass that as the third parameter to the macro.
 
-# Generating responses in Lumen
+## Generating responses in Lumen
 
 With Lumen I need to use a slighty different approach to create these responses, as Lumen does not support macros on the `Response` factory. Instead, I add these methods to my base controller for the API.
 
