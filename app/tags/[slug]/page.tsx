@@ -30,6 +30,10 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   return {
     title: `Posts tagged #${tag}`,
     description: `The latest posts that have been tagged with #${tag}.`,
+    openGraph: {
+      title: `Posts tagged #${tag}`,
+      description: `The latest posts that have been tagged with #${tag}.`,
+    },
   };
 }
 

@@ -24,6 +24,12 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   return {
     title: post.title,
     description: post.body.raw.substring(0, 100),
+    openGraph: {
+      title: post.title,
+      description: post.body.raw.substring(0, 100),
+      type: "article",
+      publishedTime: post.date,
+    },
   };
 }
 

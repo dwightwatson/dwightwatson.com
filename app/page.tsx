@@ -5,7 +5,8 @@ import { allPosts } from "contentlayer/generated";
 
 export const metadata = {
   title: "Dwight Watson's Blog",
-  description: "A blog on Laravel, Ruby on Rails & more by Dwight Watson.",
+  description:
+    "A blog on Laravel, Ruby on Rails & general web development, by Dwight Watson.",
 };
 
 export default function Home() {
