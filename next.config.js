@@ -5,10 +5,6 @@ const { withContentlayer } = require("next-contentlayer");
 const nextConfig = {
   reactStrictMode: true,
 
-  experimental: {
-    appDir: true,
-  },
-
   redirects: async () => {
     return [
       {
