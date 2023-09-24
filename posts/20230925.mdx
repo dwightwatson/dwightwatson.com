@@ -1,0 +1,38 @@
+---
+title: "Two-factor authentication (2FA) and Laravel Nova"
+slug: two-factor-authentication-2fa-and-laravel-nova
+date: 2023-05-18
+tags:
+  - laravel
+  - nova
+  - 2fa
+---
+
+Laravel Nova includes authentication functionality - registration, login, forgotten password flows & logout. However, it **doesn't** include support for two-factor authentication (2FA). It's important to note this if you're using Laravel Fortify with 2FA enabled in your app, as it provides an opportunity for users to authenticate without providing a valid code.
+
+The best way to resolve this is to disable the authentication functionality in Nova completely. This means your app will rely solely on Fortify for authentication and complete the 2FA flow as required. You can do this by stubbing out the `routes()` method in the `NovaServiceProvider`.
+
+```php
+/**
+  * Register the Nova routes.
+  */
+protected function routes(): void
+{
+    Nova::routes()
+        ->withAuthenticationRoutes()
+        ->withPasswordResetRoutes()
+        ->register();
+}
+```
+
+You can control which pieces are enabled or disable them completely.
+
+```php
+/**
+  * Register the Nova routes.
+  */
+protected function routes(): void
+{
+    //
+}
+```
