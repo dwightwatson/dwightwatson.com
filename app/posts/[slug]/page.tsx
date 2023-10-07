@@ -51,7 +51,7 @@ export default function Page({ params }) {
 
       <Outdated date={post.date} />
 
-      <div className="prose md:prose-lg mb-8">
+      <div className="prose md:prose-lg prose-a:text-blue-700 prose-a:no-underline hover:prose-a:underline prose-a:decoration-blue-300  mb-8">
         <Mdx code={post.body.code} />
       </div>
 
