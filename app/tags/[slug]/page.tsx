@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
   const tags = getPosts()
-    .flatMap((post) => post.tags)
+    .flatMap((post) => post.data.tags)
     .filter((x) => x)
     .map((tag) => kebabCase(tag));
 
