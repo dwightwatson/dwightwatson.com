@@ -40,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://www.dwightwatson.com",
       lastModified: new Date(posts[0].data.date),
     },
-  ]
-    .concat(postUrls)
-    .concat(tagUrls);
+    ...postUrls,
+    ...tagUrls,
+  ];
 }
