@@ -2,6 +2,7 @@ import { Atkinson_Hyperlegible, League_Spartan } from "next/font/google";
 import Header from "@/components/header";
 import Script from "next/script";
 import "tailwindcss/tailwind.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const leagueSpartan = League_Spartan({
   weight: "400",
@@ -49,6 +50,8 @@ export default function RootLayout({
             <main>{children}</main>
           </div>
         </div>
+
+        <SpeedInsights />
       </body>
     </html>
   );
