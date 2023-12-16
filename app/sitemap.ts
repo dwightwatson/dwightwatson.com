@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const uniqueTags = Array.from(new Set(tags));
 
   const postUrls = posts.map((post) => ({
-    url: `https://www.dwightwatson.com/posts/${post.slug}`,
+    url: `https://www.dwightwatson.com/posts/${post.data.slug}`,
     lastModified: new Date(post.data.date),
   }));
 

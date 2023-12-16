@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return getPosts().map((post) => ({
-    slug: post.slug,
+    slug: post.data.slug,
   }));
 }
 

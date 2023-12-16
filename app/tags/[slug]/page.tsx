@@ -60,7 +60,7 @@ export default function Page({ params }) {
 
       <div className="flex flex-col gap-8 mb-8">
         {posts.map((post) => (
-          <Post key={post.slug} post={post} />
+          <Post key={post.data.slug} post={post} />
         ))}
       </div>
 
