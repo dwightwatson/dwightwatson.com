@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { allPosts } from "contentlayer/generated";
+import { getPosts } from "app/db/posts";
 
 import Bio from "@/components/bio";
 import Tags from "@/components/tags";
@@ -9,32 +9,32 @@ import Mdx from "@/components/mdx";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
-  return allPosts.map((post) => ({
-    slug: post.slug,
+  return getPosts().map((post) => ({
+    slug: post.data.slug,
   }));
 }
 
 export async function generateMetadata({ params }): Promise<Metadata> {
-  const post = allPosts.find((post) => post.slug === params.slug);
+  const post = getPosts().find((post) => post.data.slug === params.slug);
 
   if (!post) {
     return;
   }
 
   return {
-    title: post.title,
-    description: post.body.raw.substring(0, 100),
+    title: post.data.title,
+    description: post.content.substring(0, 100),
     openGraph: {
-      title: post.title,
-      description: post.body.raw.substring(0, 100),
+      title: post.data.title,
+      description: post.content.substring(0, 100),
       type: "article",
-      publishedTime: post.date,
+      publishedTime: post.data.date,
     },
   };
 }
 
 export default function Page({ params }) {
-  const post = allPosts.find((post) => post.slug === params.slug);
+  const post = getPosts().find((post) => post.data.slug === params.slug);
 
   if (!post) {
     notFound();
@@ -43,16 +43,18 @@ export default function Page({ params }) {
   return (
     <>
       <div className="mb-4">
-        <h1 className="font-serif text-2xl break-words">{post.title}</h1>
-        <Date date={post.date} className="text-sm" />
+        <h1 className="font-serif text-2xl break-words">{post.data.title}</h1>
+        <Date date={post.data.date} className="text-sm" />
       </div>
 
-      {post.tags?.length && <Tags tags={post.tags} className="mb-8" />}
+      {post.data.tags?.length && (
+        <Tags tags={post.data.tags} className="mb-8" />
+      )}
 
-      <Outdated date={post.date} />
+      <Outdated date={post.data.date} />
 
       <div className="prose md:prose-lg prose-a:text-blue-700 prose-a:no-underline hover:prose-a:underline prose-a:decoration-blue-300  mb-8">
-        <Mdx code={post.body.code} />
+        <Mdx source={post.content} />
       </div>
 
       <Bio />

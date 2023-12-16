@@ -1,42 +1,46 @@
 import { MetadataRoute } from "next";
 import { compareDesc } from "date-fns";
 import { kebabCase } from "lodash";
-import { allPosts } from "contentlayer/generated";
+import { getPosts } from "app/db/posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = allPosts.sort((a, b) =>
-    compareDesc(new Date(a.date), new Date(b.date))
+  const posts = getPosts().sort((a, b) =>
+    compareDesc(new Date(a.data.date), new Date(b.data.date))
   );
 
-  const tags = allPosts
-    .flatMap((post) => post.tags)
+  const tags = getPosts()
+    .flatMap((post) => post.data.tags)
     .filter((x) => x)
     .map((tag) => kebabCase(tag));
 
   const uniqueTags = Array.from(new Set(tags));
 
   const postUrls = posts.map((post) => ({
-    url: `/posts/${post.slug}`,
-    lastModified: new Date(post.date),
+    url: `https://www.dwightwatson.com/posts/${post.data.slug}`,
+    lastModified: new Date(post.data.date),
   }));
 
   const tagUrls = uniqueTags.map((tag) => {
-    const posts = allPosts
-      .filter((post) => post.tags?.map((tag) => kebabCase(tag)).includes(tag))
-      .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+    const posts = getPosts()
+      .filter((post) =>
+        post.data.tags?.map((tag) => kebabCase(tag)).includes(tag)
+      )
+      .sort((a, b) =>
+        compareDesc(new Date(a.data.date), new Date(b.data.date))
+      );
 
     return {
-      url: `/tags/${tag}`,
-      lastModified: new Date(posts[0].date),
+      url: `https://www.dwightwatson.com/tags/${tag}`,
+      lastModified: new Date(posts[0].data.date),
     };
   });
 
   return [
     {
-      url: "/",
-      lastModified: new Date(posts[0].date),
+      url: "https://www.dwightwatson.com",
+      lastModified: new Date(posts[0].data.date),
     },
-  ]
-    .concat(postUrls)
-    .concat(tagUrls);
+    ...postUrls,
+    ...tagUrls,
+  ];
 }
