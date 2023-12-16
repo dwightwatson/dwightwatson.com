@@ -1,7 +1,7 @@
 import Bio from "@/components/bio";
 import Post from "@/components/post";
 import { compareDesc } from "date-fns";
-import { allPosts } from "contentlayer/generated";
+import { getPosts } from "app/db/posts";
 
 export const metadata = {
   title: "Dwight Watson's Blog",
@@ -10,8 +10,8 @@ export const metadata = {
 };
 
 export default function Home() {
-  const posts = allPosts.sort((a, b) =>
-    compareDesc(new Date(a.date), new Date(b.date))
+  const posts = getPosts().sort((a, b) =>
+    compareDesc(new Date(a.data.date), new Date(b.data.date))
   );
 
   return (

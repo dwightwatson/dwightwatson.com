@@ -5,17 +5,17 @@ import Tags from "./tags";
 export default function Post({ post }) {
   return (
     <article className="mb-4">
-      <Date date={post.date} className="text-gray-700" />
+      <Date date={post.data.date} className="text-gray-700" />
       <h2>
         <Link
           className="font-serif text-2xl text-blue-700 hover:underline decoration-blue-300 break-words"
-          href={`/posts/${post.slug}`}
+          href={`/posts/${post.data.slug}`}
         >
-          {post.title}
+          {post.data.title}
         </Link>
       </h2>
-      {post.tags?.length && (
-        <Tags tags={post.tags} className="mt-1 text-gray-700" />
+      {post.data.tags?.length && (
+        <Tags tags={post.data.tags} className="mt-1 text-gray-700" />
       )}
     </article>
   );

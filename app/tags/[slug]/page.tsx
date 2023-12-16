@@ -4,11 +4,11 @@ import Post from "@/components/post";
 import { Metadata } from "next";
 import { kebabCase } from "lodash";
 import { compareDesc } from "date-fns";
+import { getPosts } from "app/db/posts";
 import { notFound } from "next/navigation";
-import { allPosts } from "contentlayer/generated";
 
 export async function generateStaticParams() {
-  const tags = allPosts
+  const tags = getPosts()
     .flatMap((post) => post.tags)
     .filter((x) => x)
     .map((tag) => kebabCase(tag));
@@ -39,9 +39,11 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 export default function Page({ params }) {
   const tag = params.slug;
-  const posts = allPosts
-    .filter((post) => post.tags?.map((tag) => kebabCase(tag)).includes(tag))
-    .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+  const posts = getPosts()
+    .filter((post) =>
+      post.data.tags?.map((tag) => kebabCase(tag)).includes(tag)
+    )
+    .sort((a, b) => compareDesc(new Date(a.data.date), new Date(b.data.date)));
 
   if (posts.length === 0) {
     notFound();

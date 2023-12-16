@@ -1,6 +1,6 @@
 import { Code } from "bright";
 import Link from "next/link";
-import { useMDXComponent } from "next-contentlayer/hooks";
+import { MDXRemote } from "next-mdx-remote/rsc";
 
 const components = {
   a: ({ href, children }) => <Link href={href}>{children}</Link>,
@@ -8,11 +8,9 @@ const components = {
 };
 
 interface MdxProps {
-  code: string;
+  source: string;
 }
 
-export default function Mdx({ code }: MdxProps) {
-  const Component = useMDXComponent(code);
-
-  return <Component components={components} />;
+export default function Mdx({ source }: MdxProps) {
+  return <MDXRemote source={source} components={components} />;
 }
