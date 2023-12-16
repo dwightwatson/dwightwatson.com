@@ -8,13 +8,11 @@ function getMDXFiles(dir) {
 
 function readMDXFile(filePath) {
   let rawContent = fs.readFileSync(filePath, "utf-8");
-
   return matter(rawContent);
 }
 
 function getMDXData(dir) {
-  let mdxFiles = getMDXFiles(dir);
-  return mdxFiles.map((file) => readMDXFile(path.join(dir, file)));
+  return getMDXFiles(dir).map((file) => readMDXFile(path.join(dir, file)));
 }
 
 export function getPosts() {
