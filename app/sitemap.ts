@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const uniqueTags = Array.from(new Set(tags));
 
   const postUrls = posts.map((post) => ({
-    url: `/posts/${post.slug}`,
+    url: `https://www.dwightwatson.com/posts/${post.slug}`,
     lastModified: new Date(post.data.date),
   }));
 
@@ -30,14 +30,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       );
 
     return {
-      url: `/tags/${tag}`,
+      url: `https://www.dwightwatson.com/tags/${tag}`,
       lastModified: new Date(posts[0].data.date),
     };
   });
 
   return [
     {
-      url: "/",
+      url: "https://www.dwightwatson.com",
       lastModified: new Date(posts[0].data.date),
     },
   ]
