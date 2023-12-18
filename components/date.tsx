@@ -1,10 +1,9 @@
-import { parseJSON, format } from "date-fns";
+import { format } from "date-fns";
 
 export default function Date({ date, ...props }) {
-  const parsedDate = parseJSON(date);
   return (
-    <time dateTime={format(parsedDate, "yyyy-MM-dd")} {...props}>
-      {format(parsedDate, "MMMM d, yyyy")}
+    <time dateTime={format(date, "yyyy-MM-dd")} {...props}>
+      {format(date, "MMMM d, yyyy")}
     </time>
   );
 }
