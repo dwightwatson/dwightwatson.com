@@ -59,6 +59,18 @@ export default function Bio() {
               </a>
               .
             </li>
+            <li className="text-sm text-gray-300">
+              also writing{" "}
+              <a
+                href="https://www.minitestonrails.com"
+                className="text-gray-300 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Minitest on Rails
+              </a>
+              .
+            </li>
           </ul>
         </div>
         <Image
