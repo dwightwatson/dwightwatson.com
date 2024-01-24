@@ -1,0 +1,26 @@
+---
+title: "Log-out all users with Laravel and Redis"
+slug: log-out-all-users-with-laravel-and-redis
+date: 2024-01-24
+tags:
+  - laravel
+  - redis
+---
+
+Last week we had a need to force users to log out of our Laravel app. Depending on the session driver you use this can range from trivial to difficult. In this instance we were using Redis as our session driver.
+
+You cannot just reset your Redis instance - users will be able to refresh their session using their `remember_token` cookie. So first, clear the `remember_token` for the affected users.
+
+```php
+User::whereIn('id', [...])->each(function (User $user) {
+    $user->forceFill([
+        'remember_token' => null,
+    ])->save();
+});
+```
+
+Next, flush the Redis database. This will clear all sessions, however it should not affect users who still have a valid `remember_token` as they will remain logged in.
+
+```php
+Illuminate\Support\Facades\Redis::connection('default')->flushdb();
+```
