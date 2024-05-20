@@ -1,0 +1,78 @@
+---
+title: You don't need to use fakes straight away
+slug: you-dont-need-to-use-fakes-straight-away
+date: 2024-05-20
+tags:
+  - laravel
+  - phpunit
+---
+
+In Laravel test suites it's common to set up all your fakes straight away. It's good practice to clearly set up some expectation about a test. Enabling a fake (queues, notification, or events) can signal that the test involves making assertions on those fakes.
+
+```php
+public function test_job_is_dispatched(): void
+{
+    Queue::fake();
+
+    $this->actingAs($user = User::factory()->create())
+        ->post('/dispatch-job')
+        ->assertOk();
+
+    Queue::assertPushed(ExampleJob::class);
+}
+```
+
+Alternatively it can be used to simply stub out some behaviour we don't want to engage. For example, disabling events because they aren't relevant in a given scenario.
+
+```php
+public function test_request_is_successful(): void
+{
+    Event::fake();
+
+    $this->actingAs($user = User::factory()->create())
+        ->post('/emit-event')
+        ->assertOk();
+}
+```
+
+Sometimes the test setup may invoke different behaviour on the same facade. In a test scenario you may want some behaviour to run but stub out others to make assertions on. Most of Laravel's test facades allow you to do this explicitly by passing in what you want to stub out.
+
+```php
+use App\Jobs\CreateDefaultTeam;
+use App\Jobs\PurgeTeam;
+
+public function test_it_purges_a_deleted_team(): void
+{
+    Queue::fake(PurgeTeam::class);
+
+    // Imagine here that the `User` observer dispatches `CreateDefaultTeam`
+    // which will create the default team we intend to delete.
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->delete('/team');
+
+    Queue::assertPushed(PurgeTeam::class);
+}
+```
+However there are use-cases where you may not want to enable a fake straight away. If your models have observers that will trigger behaviour on creation that you also want to test inside a request, moving the fake **after** the observers have fired will let you be specific about your assertion.
+
+```php
+public function test_listing_is_reindexed(): void
+{
+    // The profile has an observer that fires `ReindexProfile` on save,
+    // but we aren't interested in that as part of this test.
+    $profile = Profile::factory()->create();
+
+    Queue::fake();
+
+    $this->actingAs($user)
+        ->put("/profiles/{$profile->id}")
+        ->assertRedirect("/profiles/{$profile->id}");
+
+    Queue::assertPushed(ReindexProfile::class);
+}
+```
+
+There are other ways to achieve this, but I'm not as keen on them:
+* You could keep the queue fake at the beginning and get the test passing by increating the count given to the assertion - like `Queue::assertPushedTimes(ReindexProfile::class, 2)`. However that isn't as clear as simply moving the fake around and can be more brittle.
+* You could create the model with `Profile::factory()->createQuietly()` if you don't actually need the behaviour to run. But again the intention isn't as clear.
