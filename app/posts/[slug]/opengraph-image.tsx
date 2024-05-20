@@ -1,4 +1,3 @@
-import { getPosts } from "../../db/posts";
 import { ImageResponse } from "next/og";
 
 // Image metadata
@@ -11,7 +10,9 @@ export const contentType = "image/png";
 
 // Image generation
 export default async function Image({ params }) {
-  const post = getPosts().find((post) => post.data.slug === params.slug);
+  const post = await fetch(
+    `https://www.dwightwatson.com/api/posts/${params.slug}`,
+  ).then((res) => res.json());
 
   return new ImageResponse(
     (
@@ -30,7 +31,7 @@ export default async function Image({ params }) {
         }}
       >
         <div style={{ fontSize: 32, color: "#2563eb" }}>dwightwatson.com</div>
-        <div style={{ fontSize: 64, lineClamp: 2 }}>{post.data.title}</div>
+        <div style={{ fontSize: 64, lineClamp: 2 }}>{post.data.data.title}</div>
       </div>
     ),
     // ImageResponse options
