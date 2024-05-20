@@ -1,8 +1,7 @@
-import { getPosts } from "@/app/db/posts";
+import { getPosts } from "../../db/posts";
 import { ImageResponse } from "next/og";
 
 // Image metadata
-export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
