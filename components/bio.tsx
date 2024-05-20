@@ -17,8 +17,7 @@ export default function Bio() {
                 rel="noopener noreferrer"
               >
                 Roomies
-              </a>
-              ,{" "}
+              </a> &amp;{" "}
               <a
                 href="https://highschoolnotes.com.au"
                 className="text-gray-700 underline"
@@ -26,15 +25,6 @@ export default function Bio() {
                 rel="noopener noreferrer"
               >
                 High School Notes
-              </a>{" "}
-              &amp;{" "}
-              <a
-                href="https://studentvip.com.au"
-                className="text-gray-700 underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                StudentVIP
               </a>
               .
             </li>
@@ -56,18 +46,6 @@ export default function Bio() {
                 rel="noopener noreferrer"
               >
                 Flatmates
-              </a>
-              .
-            </li>
-            <li className="text-sm text-gray-300">
-              also writing{" "}
-              <a
-                href="https://www.minitestonrails.com"
-                className="text-gray-300 underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Minitest on Rails
               </a>
               .
             </li>
