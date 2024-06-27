@@ -1,0 +1,36 @@
+---
+title: Implementing MultipleInstanceManager in Laravel
+slug: implementing-multipleinstancemanager-in-laravel
+date: 2024-06-27
+tags:
+  - laravel
+  - php
+---
+# Implementing MultipleInstanceManager in Laravel
+
+While building [phonable](https://github.com/roomies-com/phonable) I wanted to support multiple services like Prelude and Vonage simultaneously - to match how we used those services on [Roomies](https://www.roomies.com). To do this I used the default [`Manager` class](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Support/Manager.php) that comes with Laravel. It provides a similar interface to abstractions Laravel provides around caching systems databases and mail services.
+
+One frustrating limitation of this `Manager` implementation is that by default it restricts you to a single instance of any connection. Without extending it in your own code you are limited to a single Prelude/Vonage/Twilio instance. I shipped and adopted the package internally anyway as it wasn't a showstopper but it is something I wanted to address.
+
+## The Solution: MultipleInstanceManager
+
+[Newton Job pointed out on X](https://x.com/_newtonjob/status/1762532906910482793) that Laravel has a [`MultipleInstanceManager`](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Support/MultipleInstanceManager.php) class. This class provides everything I needed to allow for multiple instances of drivers.
+
+I implemented the required changes in [a relatively simple PR](https://github.com/roomies-com/phonable/pull/3).
+
+## Key Aspects of MultipleInstanceManager
+
+Some interesting aspects of `MultipleInstanceManager` addressed in the PR include:
+
+1. Managing the default instance name and allowing it to be changed at runtime.
+2. Implementing `getInstanceConfig` to return the appropriate configuration for a given instance name. The `driver` key determines which method to call.
+3. Manually binding the manager. `MultipleInstanceManager` requires an application instance though it isn't type-hinted.
+
+```php
+$this->app->bind(
+    abstract: 'phone-verification',
+    concrete: fn ($app) => new Verification\Manager($app),
+);
+```
+
+Moving to `MultipleInstanceManager` required no breaking changes. It's a great base to take your manager implementation to the next level if you require it.
