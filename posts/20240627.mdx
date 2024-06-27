@@ -6,7 +6,6 @@ tags:
   - laravel
   - php
 ---
-# Implementing MultipleInstanceManager in Laravel
 
 While building [phonable](https://github.com/roomies-com/phonable) I wanted to support multiple services like Prelude and Vonage simultaneously - to match how we used those services on [Roomies](https://www.roomies.com). To do this I used the default [`Manager` class](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Support/Manager.php) that comes with Laravel. It provides a similar interface to abstractions Laravel provides around caching systems databases and mail services.
 
