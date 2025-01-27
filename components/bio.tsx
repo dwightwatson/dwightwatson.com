@@ -9,7 +9,7 @@ export default function Bio() {
           <p>A blog about Laravel & Rails by Dwight Watson;</p>
           <ul className="list-disc text-sm pl-4">
             <li className="text-gray-700">
-              developer of{" "}
+              building{" "}
               <a
                 href="https://www.roomies.com"
                 className="text-gray-700 underline"
@@ -17,7 +17,17 @@ export default function Bio() {
                 rel="noopener noreferrer"
               >
                 Roomies
-              </a> &amp;{" "}
+              </a>
+              ,{" "}
+              <a
+                href="https://www.myinspections.com"
+                className="text-gray-700 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                myInspections
+              </a>{" "}
+              &amp;{" "}
               <a
                 href="https://highschoolnotes.com.au"
                 className="text-gray-700 underline"
