@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "22.10.7",
+    "@types/node": "22.10.10",
     "@types/react": "19.0.2",
     "autoprefixer": "^10.4.20",
     "eslint": "9.18.0",
