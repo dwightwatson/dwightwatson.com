@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --font-sans: var(--atkinson-hyperlegible), sans-serif;
+  --font-serif: var(--league-spartan), serif;
+}

@@ -1,7 +1,7 @@
 import { Atkinson_Hyperlegible, League_Spartan } from "next/font/google";
 import Header from "@/components/header";
 import Script from "next/script";
-import "tailwindcss/tailwind.css";
+import "./global.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
