@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vercel/analytics": "^1.4.1",
-    "@vercel/speed-insights": "^1.1.0",
+    "@vercel/speed-insights": "^1.2.0",
     "bright": "^1.0.0",
     "date-fns": "^4.1",
     "gray-matter": "^4.0.3",
