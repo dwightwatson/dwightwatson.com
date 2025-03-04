@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { getPosts } from "app/db/posts";
+import type { Metadata } from "next";
 
-import Bio from "@/components/bio";
+import { getPosts } from "app/db/posts";
 import Tags from "@/components/tags";
 import Date from "@/components/date";
 import Outdated from "@/components/outdated";
 import Mdx from "@/components/mdx";
-import type { Metadata } from "next";
+import Links from "@/components/links";
 
 export function generateStaticParams() {
   return getPosts().map((post) => ({
@@ -45,7 +45,7 @@ export default async function Page(props) {
   return (
     <>
       <div className="mb-4">
-        <h1 className="font-serif text-2xl break-words">{post.data.title}</h1>
+        <h1 className="font-serif text-4xl break-words">{post.data.title}</h1>
         <Date date={post.data.date} className="text-sm" />
       </div>
 
@@ -55,11 +55,13 @@ export default async function Page(props) {
 
       <Outdated date={post.data.date} />
 
-      <div className="prose md:prose-lg prose-a:text-blue-700 prose-a:no-underline hover:prose-a:underline prose-a:decoration-blue-300  mb-8">
+      <div className="prose md:prose-lg prose-a:text-cyan-700 prose-a:underline prose-a:font-semibold prose-a:decoration-cyan-500 prose-a:underline-offset-2 mb-8">
         <Mdx source={post.content} />
       </div>
 
-      <Bio />
+      <div className="lg:hidden border-t border-gray-200 mt-8">
+        <Links />
+      </div>
     </>
   );
 }

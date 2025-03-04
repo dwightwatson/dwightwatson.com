@@ -1,11 +1,10 @@
-import Bio from "@/components/bio";
-import Post from "@/components/post";
-
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { kebabCase } from "lodash";
 import { compareDesc } from "date-fns";
+
 import { getPosts } from "app/db/posts";
-import { notFound } from "next/navigation";
+import Post from "@/components/post";
 
 export async function generateStaticParams() {
   const tags = getPosts()
@@ -43,7 +42,7 @@ export default async function Page(props) {
   const tag = params.slug;
   const posts = getPosts()
     .filter((post) =>
-      post.data.tags?.map((tag) => kebabCase(tag)).includes(tag)
+      post.data.tags?.map((tag) => kebabCase(tag)).includes(tag),
     )
     .sort((a, b) => compareDesc(new Date(a.data.date), new Date(b.data.date)));
 
@@ -56,7 +55,7 @@ export default async function Page(props) {
   return (
     <>
       <div className="mb-4">
-        <h1 className="font-serif text-2xl bread-words">#{tag}</h1>
+        <h1 className="font-serif text-4xl bread-words">#{tag}</h1>
         <small>{tagHeader}</small>
       </div>
 
@@ -65,8 +64,6 @@ export default async function Page(props) {
           <Post key={post.data.slug} post={post} />
         ))}
       </div>
-
-      <Bio />
     </>
   );
 }

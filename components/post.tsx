@@ -8,7 +8,7 @@ export default function Post({ post }) {
       <Date date={post.data.date} className="text-gray-700" />
       <h2>
         <Link
-          className="font-serif text-2xl text-blue-700 hover:underline decoration-blue-300 break-words"
+          className="font-serif text-2xl text-cyan-700 hover:underline decoration-cyan-300 break-words"
           href={`/posts/${post.data.slug}`}
         >
           {post.data.title}

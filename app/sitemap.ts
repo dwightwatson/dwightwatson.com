@@ -1,11 +1,12 @@
 import { MetadataRoute } from "next";
 import { compareDesc } from "date-fns";
 import { kebabCase } from "lodash";
+
 import { getPosts } from "app/db/posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getPosts().sort((a, b) =>
-    compareDesc(new Date(a.data.date), new Date(b.data.date))
+    compareDesc(new Date(a.data.date), new Date(b.data.date)),
   );
 
   const tags = getPosts()
@@ -23,10 +24,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const tagUrls = uniqueTags.map((tag) => {
     const posts = getPosts()
       .filter((post) =>
-        post.data.tags?.map((tag) => kebabCase(tag)).includes(tag)
+        post.data.tags?.map((tag) => kebabCase(tag)).includes(tag),
       )
       .sort((a, b) =>
-        compareDesc(new Date(a.data.date), new Date(b.data.date))
+        compareDesc(new Date(a.data.date), new Date(b.data.date)),
       );
 
     return {
