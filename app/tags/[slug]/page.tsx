@@ -55,7 +55,7 @@ export default async function Page(props) {
   return (
     <>
       <div className="mb-4">
-        <h1 className="font-serif text-4xl bread-words">#{tag}</h1>
+        <h1 className="font-serif text-4xl break-words">#{tag}</h1>
         <small>{tagHeader}</small>
       </div>
 
