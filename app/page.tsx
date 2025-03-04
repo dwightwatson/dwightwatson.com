@@ -1,6 +1,6 @@
-import Bio from "@/components/bio";
-import Post from "@/components/post";
 import { compareDesc } from "date-fns";
+
+import Post from "@/components/post";
 import { getPosts } from "app/db/posts";
 
 export const metadata = {
@@ -11,18 +11,14 @@ export const metadata = {
 
 export default function Home() {
   const posts = getPosts().sort((a, b) =>
-    compareDesc(new Date(a.data.date), new Date(b.data.date))
+    compareDesc(new Date(a.data.date), new Date(b.data.date)),
   );
 
   return (
-    <div>
-      <Bio />
-
-      <div className="flex flex-col gap-8 mb-8">
-        {posts.map((post) => (
-          <Post key={post.data.slug} post={post} />
-        ))}
-      </div>
+    <div className="flex flex-col gap-8 mb-8">
+      {posts.map((post) => (
+        <Post key={post.data.slug} post={post} />
+      ))}
     </div>
   );
 }

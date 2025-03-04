@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${atkinsonHyperlegible.variable} ${leagueSpartan.variable} bg-white text-black}`}
+      className={`${atkinsonHyperlegible.variable} ${leagueSpartan.variable} bg-white text-black`}
     >
       <head>
         <link rel="icon" href="/tsunami.png" type="image/png" />
@@ -41,15 +41,13 @@ export default function RootLayout({
         `}
         </Script>
       </head>
-      <body className="font-sans">
-        <div className="border-t-4 border-blue-600 selection:bg-blue-600 selection:text-white">
-          <div className="max-w-prose mx-auto px-4">
-            <header className="py-4">
-              <Header />
-            </header>
+      <body className="font-sans selection:bg-cyan-600 selection:text-white p-6 lg:p-12 min-h-screen">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
+          <header className="lg:sticky top-12 h-fit">
+            <Header />
+          </header>
 
-            <main>{children}</main>
-          </div>
+          <main className="flex-1 max-w-prose">{children}</main>
         </div>
 
         <Analytics />

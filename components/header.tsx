@@ -1,22 +1,27 @@
-"use client";
+import Image from "next/image";
+import me from "../public/dwight-watson.jpg";
+import HeaderLink from "@/components/header-link";
+import Links from "@/components/links";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+const Header = () => {
+  return (
+    <>
+      <div className="flex items-center lg:flex-col lg:items-start gap-4 mb-4">
+        <Image
+          src={me}
+          alt="Picture of Dwight Watson"
+          className="inline-block shrink-0 rounded-full overflow-hidden size-20"
+        />
 
-export default function Header() {
-  const pathname = usePathname();
-  const link = (
-    <Link
-      href="/"
-      className="text-blue-600 hover:underline decoration-blue-300"
-    >
-      Dwight Watson&apos;s blog
-    </Link>
+        <div>
+          <HeaderLink />
+          <p>A blog about Laravel & Rails.</p>
+        </div>
+      </div>
+
+      <Links className="hidden lg:block" />
+    </>
   );
+};
 
-  if (pathname === "/") {
-    return <h1 className="font-serif text-2xl">{link}</h1>;
-  }
-
-  return <h3 className="font-serif text-xl">{link}</h3>;
-}
+export default Header;
