@@ -59,9 +59,7 @@ export default async function Page(props) {
         <Mdx source={post.content} />
       </div>
 
-      <div className="lg:hidden border-t border-gray-200 mt-8">
-        <Links />
-      </div>
+      <Links className="lg:hidden border-t border-gray-200 mt-8" />
     </>
   );
 }
