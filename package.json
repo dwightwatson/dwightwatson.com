@@ -23,7 +23,7 @@
     "sharp": "^0.34.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "24.0.7",
     "@types/react": "19.1.8",
