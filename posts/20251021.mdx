@@ -107,7 +107,7 @@ vendor/bin/vapor database:tunnel vapor-app-name
 Next, use `mysqldump` pointed to the correct port (it used 3305 for me). Depending on how you have MySQL installed the location of `mysqldump` may vary. I used `brew install mysql-client` which installs the CLI tools without the database itself.
 
 ```sh
-/opt/homebrew/opt/mysql-client@8.0/bin/mysqldump -h 127.0.0.1 -P 3305 -u vapor -p vapor --single-transaction > dump.sql
+/opt/homebrew/opt/mysql-client@8.0/bin/mysqldump --set-gtid-purged=OFF --single-transaction -h 127.0.0.1 -P 3305 -u vapor -p vapor > dump.sql
 ```
 
 ### Restore the database dump
