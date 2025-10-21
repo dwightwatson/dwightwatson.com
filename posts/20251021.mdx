@@ -1,0 +1,139 @@
+---
+title: Migrating from Laravel Vapor to Laravel Cloud
+slug: migrating-from-laravel-vapor-to-laravel-cloud
+date: 2025-10-21
+tags:
+  - laravel vapor
+  - laravel cloud
+---
+
+I was a day-one subscriber to [Laravel Vapor](https://vapor.laravel.com). I work on a number of apps that have seasonal traffic (which can easily balloon to 10x traffic on certain weeks of the year) so the premise of not having to think about infrastructure was attractive. For various (uninteresting) reasons I never ended up moving anything onto Vapor, but I did launch a number of smaller projects on it. Now that [Laravel Cloud](https://cloud.laravel.com) is available it seemed like a better solution for these apps and so I wanted to explore migrating off of Vapor.
+
+This isn’t a comprehensive guide but more me documenting the things I had to work through to get my apps ready to migrate to Cloud.
+
+## Configuration
+
+Keep your `APP_KEY` for any encryption you want to keep working.
+
+By default Laravel Cloud sets `LOG_CHANNEL=laravel-cloud-socket` - but I also want my errors to go to Sentry. To handle this I override `LOG_CHANNEL` to the stack and then set my own stack.
+
+```
+LOG_CHANNEL=stack
+LOG_STACK=laravel-cloud-socket,sentry
+```
+
+Review your environment configuration on Vapor and copy over the remaining options that are relevant for Cloud.
+
+## Queues
+
+Vapor uses [AWS SQS](https://aws.amazon.com/sqs) to really scale queues, but on Cloud you could probably get away with using Laravel’s database driver. If your app doesn’t have the `jobs` tables already you can use the Artisan command to create it.
+
+```sh
+php artisan make:queue-table
+```
+
+If you outgrow the database driver [Cloud does support additional options](https://cloud.laravel.com/docs/queues).
+
+## Caching
+
+Vapor uses [AWS DynamoDB](https://aws.amazon.com/dynamodb) as a cache driver. I opted to also explore Laravel’s database driver. Again if your app doesn’t have the `cache` tables you can create them.
+
+```sh
+php artisan make:cache-table
+```
+
+And if you outgrow the database driver you can simply try [Laravel KV Store](https://cloud.laravel.com/docs/resources/kv-stores).
+
+## Storage
+
+Vapor can automatically configure an [AWS S3 bucket](https://aws.amazon.com/s3) for your app’s storage. This is something that is a little more difficult to move around. Instead I decided to keep the bucket and re-use it for Cloud. This is a two step process.
+
+### Create credentials
+
+You’ll need an AWS access key/secret access key to access S3. If you don’t have them already you can create a new user with credentials and assign a policy that will give it access to your bucket. I’ve found that these permissions cover my use of S3 with Laravel:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::your-bucket-name/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": "arn:aws:s3:::your-bucket-name"
+        }
+    ]
+}
+```
+
+### Configure environment
+
+Finally, let your app know it’s using S3 by configuring the disk from the environment.
+
+```
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=ap-southeast-2
+AWS_BUCKET=your-bucket-name
+```
+
+## Database
+
+Finally - the big one. There are some options here: you could point Cloud to your existing RDS instance (and pay the external bandwidth costs), or migrate your data into a Cloud database instance. For my use-cases I wanted to actually move the data into Cloud.
+
+### Create a database dump
+
+First you can use `mysqldump` to create a complete dump of your database. It’s worth running this a few times before you intend to do the final migration just to find any issues and get a feel for the time involved.
+
+First, use the Vapor CLI to create a database tunnel. It will tunnel your database to a local port.
+
+```sh
+vendor/bin/vapor database:tunnel vapor-app-name
+```
+
+Next, use `mysqldump` pointed to the correct port (it used 3305 for me). Depending on how you have MySQL installed the location of `mysqldump` may vary. I used `brew install mysql-client` which installs the CLI tools without the database itself.
+
+```sh
+/opt/homebrew/opt/mysql-client@8.0/bin/mysqldump -h 127.0.0.1 -P 3305 -u vapor -p vapor --single-transaction > dump.sql
+```
+
+### Restore the database dump
+
+Next, create your MySQL database inside Laravel Cloud. You will need to turn on “Enable public endpoint” so that you can access the database remotely.
+
+Run the `mysql` command to connect to the database and give it time to restore your `dump.sql`.
+
+```
+/opt/homebrew/opt/mysql-client@8.0/bin/mysql -h your-db-host.ap-southeast-2.public.db.laravel.cloud -P 3306 -u your-db-username -p main < dump.sql
+```
+
+After this is complete do some sanity checks on the database to make sure that it contains all the data you expect.
+
+## Go-time
+
+When you’re ready to go, you will want to put Vapor into maintenance mode - it will stop the app and the queues. This gives you the opportunity to start the database migration and turn your DNS into Cloud.
+
+```sh
+vendor/bin/vapor down production
+```
+
+This leaves everything in your AWS account running still - so as you are ready you can begin to remove the project from Vapor and wind down the resources that you aren’t using.
+
+## Conclusion
+
+Luckily, migrating from Vapor to Cloud isn’t difficult at all. The most daunting part is the database (as always) but dumping and restoring is a pretty simple process that you can test and get familiar with before getting ready for the final migration.
+
+There are trade-offs between both services and they excel for different reasons. Be sure to understand the needs of your apps before choosing where to deploy or migrate them.
