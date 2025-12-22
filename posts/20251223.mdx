@@ -1,0 +1,50 @@
+---
+title: headerSearchBarOptions in Expo
+slug: headersearchbaroptions-in-expo
+date: 2025-12-23
+tags:
+  - expo
+  - react native
+---
+
+# headerSearchBarOptions in Expo
+
+One really cool (but seemingly lesser known) features of React Navigation is the `headerSearchBarOptions` configuration. It gives you a native search bar in the app header in only a few lines of code. It’s even better now in Expo SDK 54 because on devices running iOS 26 will get the native Liquid Glass search bar for free.
+
+Simply set the `headerSearchBarOptions` on your screen. You can then set the search query straight on to the current path.
+
+```js
+import { useRouter } from "expo-router";
+
+export default function Layout() {
+  const router = useRouter();
+
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+         options={{
+          title: "Home",
+
+          headerSearchBarOptions: {
+            placeholder: "What are you looking for?",
+      onChangeText: (event) => {
+            router.setParams({ query: event.nativeEvent.text });
+          }}
+        }}
+     />
+   </Stack>
+  );
+}
+```
+
+Then you can access the query string from your component.
+
+```
+import { useLocalSearchParams } from "expo-router";
+
+export default function Home() {
+  const { query } = useLocalSearchParams<{ query: string }>();
+
+  return <Text>{query}</Text>;
+}
