@@ -9,7 +9,7 @@ tags:
 
 I was a day-one subscriber to [Laravel Vapor](https://vapor.laravel.com). I work on a number of apps that have seasonal traffic (which can easily balloon to 10x traffic on certain weeks of the year) so the premise of not having to think about infrastructure was attractive. For various (uninteresting) reasons I never ended up moving anything onto Vapor, but I did launch a number of smaller projects on it. Now that [Laravel Cloud](https://cloud.laravel.com) is available it seemed like a better solution for these apps and so I wanted to explore migrating off of Vapor.
 
-This isn’t a comprehensive guide but more me documenting the things I had to work through to get my apps ready to migrate to Cloud.
+This isn’t a comprehensive guide but more me documenting the things I had to work through to get my apps ready to migrate to Cloud. For more information, check out [Laravel's new official Vapor to Cloud migration guide](https://cloud.laravel.com/migration-vapor-cloud).
 
 ## Configuration
 
@@ -137,3 +137,5 @@ This leaves everything in your AWS account running still - so as you are ready y
 Luckily, migrating from Vapor to Cloud isn’t difficult at all. The most daunting part is the database (as always) but dumping and restoring is a pretty simple process that you can test and get familiar with before getting ready for the final migration.
 
 There are trade-offs between both services and they excel for different reasons. Be sure to understand the needs of your apps before choosing where to deploy or migrate them.
+
+If you want to read more, check out [Phil Sturgeon's post on zero-downtime migration to Laravel Cloud](https://apisyouwonthate.com/blog/zero-downtime-migration-from-laravel-vapor-to-laravel-cloud) and the official [Laravel Vapor to Cloud migration guide](https://cloud.laravel.com/migration-vapor-cloud).
