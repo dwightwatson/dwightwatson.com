@@ -33,7 +33,6 @@ $latestJobs = $location->jobs()
     ->latest()
     ->remember(now()->addDay())
     ->simplePaginate();
-});
 ```
 
 I’m going to explore some of the options available to temporarily side-step this problem, make use of the `serializable_classes` config, or update your code to be compatible.
@@ -80,7 +79,7 @@ If you were caching results (paginated or not) directly, you may need to think m
 
 One idea is to store an array of model IDs and then query those directly. The trade-off is this will result in a double-up of queries, but the ID look up should be quick and you’ll also get up to date models.
 
-```
+```php
 $ids = Cache::remember("locations.{$location->id}.jobs.popular', now()->addDay(), function () use ($location) {
     return $location->jobs()
         ->popular()
