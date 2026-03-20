@@ -35,6 +35,16 @@ $latestJobs = $location->jobs()
     ->simplePaginate();
 ```
 
+After upgrading to Laravel 13 these patterns towards caching started resulting in errors like these:
+
+```
+The script tried to call a method on an incomplete object. Please ensure that the class definition "Illuminate\Database\Eloquent\Collection" of the object you are trying to operate on was loaded _before_ unserialize() gets called or provide an autoloader to load the class definition
+```
+
+```
+App\View\Components\Grid::__construct(): Argument #1 ($listings) must be of type Illuminate\Pagination\Paginator, __PHP_Incomplete_Class given, called in /app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1171
+```
+
 I’m going to explore some of the options available to temporarily side-step this problem, make use of the `serializable_classes` config, or update your code to be compatible.
 
 ## Disable `serializable_class`
