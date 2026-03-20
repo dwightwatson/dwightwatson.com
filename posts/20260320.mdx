@@ -1,0 +1,111 @@
+---
+title: Serializable classes in Laravel 13
+slug: serializable-class-in-laravel-13
+date: 2026-03-20
+tags:
+  - laravel
+---
+
+# Serializable classes in Laravel 13
+
+[Laravel 13 introduces a breaking change that affects caching PHP classes](https://laravel.com/docs/13.x/upgrade#cache-serializable_classes-configuration) to help prevent your application from attacks. You’re now required to explicitly allow which classes can be serialised.
+
+```php
+'serializable_classes' => [
+    App\Data\CachedDashboardStats::class,
+    App\Support\CachedPricingSnapshot::class,
+],
+```
+
+This change unfortunately affects some of the patterns I use: directly caching paginated Eloquent result sets, and [using the `rememberable` query cache](https://github.com/dwightwatson/rememberable).
+
+```php
+// Using the cache directly
+$popularJobs = Cache::remember("locations.{$location->id}.jobs.popular", now()->addDay(), function () use ($location) {
+    return $location->jobs()
+        ->popular()
+        ->take(4)
+        ->get();
+});
+
+// Using the `rememberable` query cache
+$latestJobs = $location->jobs()
+    ->latest()
+    ->remember(now()->addDay())
+    ->simplePaginate();
+});
+```
+
+I’m going to explore some of the options available to temporarily side-step this problem, make use of the `serializable_classes` config, or update your code to be compatible.
+
+## Disable `serializable_class`
+
+The easiest solution (especially if you want to upgrade to Laravel 13 first and resolve this later) is to disable the feature. Updating the value to `true` effectively returns you to Laravel 12 behaviour.
+
+```php
+// Work as it would have in Laravel 12.
+'serializable_classes' => true,
+```
+
+## Update the allowed classes
+
+The next option is to go through and review what you’re caching and then specifically allow those classes. For me this meant specifically including Eloquent collections, the paginator and the referenced models.
+
+```php
+'serializable_classes' => [
+    App\Models\Location::class,
+    Carbon\Carbon::class,
+    Illuminate\Database\Eloquent\Collection::class,
+    Illuminate\Pagination\Paginator::class,
+],
+```
+
+You may need to dive your code and test locally to ensure you’ve covered all your bases. This should resolve the problem, but it doesn’t feel **right** to me.
+
+## Update your code
+
+That Laravel has introduced this as a safety change is a pretty clear signal that should be used with care. I’d almost consider it a smell to be using this config too often.
+
+Laravel 13 only shipped this week so I’m still exploring how best to migrate code. I’ll update this post as I come across more ideas.
+
+### `Rememberable`
+
+Unfortunately `rememberable` is affected directly as it caches the direct result of your Eloquent query - for example an instance of `Paginator` or `Collection`. Going forward it appears your options are to explicitly allow the classes you need, or begin to migrate your code away from `rememberable`.
+
+`Rememberable` was originally revived with forked code from Laravel after the feature was removed in Laravel 5. It’s had a pretty good run since, and I have updated it to support Laravel 13, but this does feel like the writing is on the wall.
+
+### Eloquent result caching
+
+If you were caching results (paginated or not) directly, you may need to think more carefully about what you cache and how you use it.
+
+One idea is to store an array of model IDs and then query those directly. The trade-off is this will result in a double-up of queries, but the ID look up should be quick and you’ll also get up to date models.
+
+```
+$ids = Cache::remember("locations.{$location->id}.jobs.popular', now()->addDay(), function () use ($location) {
+    return $location->jobs()
+        ->popular()
+        ->take(4)
+        ->pluck('id')
+        ->all();
+});
+
+// Re-sort the jobs in PHP
+$jobs = Job::find($ids)
+    ->sortBy(fn ($model) => array_search($model->id, $ids));
+
+// Re-sort the jobs in MySQL
+$jobs = Job::whereIn('id', $ids)
+    ->orderByRaw('FIELD(id, ' . implode(',', $ids) . ')')
+    ->get();
+
+// Re-sort the jobs in Postgres
+$jobs = Job::whereIn('id', $ids)
+    ->orderByRaw('array_position(ARRAY[' . implode(',', $ids) . '], id)')
+    ->get();
+```
+
+I’m wondering if it would be beneficial for Laravel to have some this built into the query builder or perhaps write a macro for it myself. Perhaps something like `Job::whereIn(‘id’, $ids)->inOrderOf(‘id’, $ids)->get()` where you are still explicit about it but it supports all the database drivers.
+
+---
+
+I’d be curious to hear how many other people have run into this problem upgrading to Laravel 13 and the sorts of solutions they’ve come up with. Please reach out on Twitter if you have any thoughts or better ideas on how to handle `serializable_class`.
