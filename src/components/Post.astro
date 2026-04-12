@@ -1,0 +1,23 @@
+---
+import DateComponent from "./Date.astro";
+import Tags from "./Tags.astro";
+
+const { post } = Astro.props;
+---
+
+<article class="mb-4">
+  <DateComponent date={post.data.date} class="text-gray-700" />
+  <h2>
+    <a
+      class="font-serif text-2xl text-cyan-700 hover:underline decoration-cyan-300 break-words"
+      href={`/posts/${post.data.slug}`}
+    >
+      {post.data.title}
+    </a>
+  </h2>
+  {
+    post.data.tags?.length && (
+      <Tags tags={post.data.tags} class="mt-1 text-gray-700" />
+    )
+  }
+</article>

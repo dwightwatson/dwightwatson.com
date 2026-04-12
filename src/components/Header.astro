@@ -1,0 +1,38 @@
+---
+import { Image } from "astro:assets";
+import me from "../assets/dwight-watson.jpg";
+import Links from "./Links.astro";
+
+interface Props {
+  pathname: string;
+}
+
+const { pathname } = Astro.props;
+const isHome = pathname === "/";
+
+---
+
+<div class="flex items-center lg:flex-col lg:items-start gap-4 mb-4">
+  <Image
+    src={me}
+    alt="Dwight Watson"
+    class="inline-block shrink-0 rounded-full overflow-hidden size-20"
+  />
+
+  <div>
+    {
+      isHome ? (
+        <h1 class="font-serif text-4xl">
+          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300">Dwight Watson</a>
+        </h1>
+      ) : (
+        <h3 class="font-serif text-xl">
+          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300">Dwight Watson</a>
+        </h3>
+      )
+    }
+    <p>A blog about Laravel & Rails.</p>
+  </div>
+</div>
+
+<Links class="hidden lg:block" />
