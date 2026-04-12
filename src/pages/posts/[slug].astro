@@ -24,7 +24,7 @@ const { Content } = await render(post);
     <DateComponent date={post.data.date} class="text-sm" />
   </div>
 
-  {post.data.tags?.length && <Tags tags={post.data.tags} class="mb-8" />}
+  {post.data.tags?.length > 0 && <Tags tags={post.data.tags} class="mb-8" />}
 
   <Outdated date={post.data.date} />
 
