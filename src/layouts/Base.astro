@@ -1,7 +1,5 @@
 ---
-import "@fontsource/atkinson-hyperlegible/400.css";
-import "@fontsource/atkinson-hyperlegible/700.css";
-import "@fontsource/league-spartan/400.css";
+import { Font } from "astro:assets";
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 
@@ -20,6 +18,8 @@ const { title, description } = Astro.props;
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <link rel="icon" href="/tsunami.png" type="image/png" />
+    <Font cssVariable="--font-sans" preload />
+    <Font cssVariable="--font-serif" preload />
 
     <script
       is:inline

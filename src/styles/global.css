@@ -2,7 +2,3 @@
 
 @plugin "@tailwindcss/typography";
 
-@theme {
-  --font-sans: "Atkinson Hyperlegible", sans-serif;
-  --font-serif: "League Spartan", serif;
-}
