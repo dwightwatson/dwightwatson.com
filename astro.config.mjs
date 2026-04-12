@@ -24,6 +24,9 @@ export default defineConfig({
       weights: [400],
     },
   ],
+  build: {
+    format: "file",
+  },
   vite: {
     plugins: [tailwindcss()],
   },
