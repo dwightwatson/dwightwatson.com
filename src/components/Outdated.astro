@@ -1,0 +1,24 @@
+---
+interface Props {
+  date: Date;
+}
+
+const { date } = Astro.props;
+
+const twoYearsAgo = new Date();
+twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+const isOutdated = new Date(date) < twoYearsAgo;
+---
+
+{
+  isOutdated && (
+    <div class="border border-gray-300 rounded-md p-4 mb-8">
+      <p>
+        <span class="font-bold">
+          This blog post was originally published a little while ago.
+        </span>{" "}
+        Please consider that it may no longer be relevant or even accurate.
+      </p>
+    </div>
+  )
+}

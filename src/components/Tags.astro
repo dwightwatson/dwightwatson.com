@@ -1,0 +1,14 @@
+---
+import Tag from "./Tag.astro";
+
+interface Props {
+  tags: string[];
+  class?: string;
+}
+
+const { tags, class: className } = Astro.props;
+---
+
+<div class={`flex gap-4 ${className}`}>
+  {tags.sort().map((tag) => <Tag tag={tag} />)}
+</div>

@@ -1,0 +1,18 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Post from "../components/Post.astro";
+
+const posts = (await getCollection("posts")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+
+<Base
+  title="Dwight Watson's Blog"
+  description="A blog on Laravel, Ruby on Rails & general web development, by Dwight Watson."
+>
+  <div class="flex flex-col gap-8 mb-8">
+    {posts.map((post) => <Post post={post} />)}
+  </div>
+</Base>
