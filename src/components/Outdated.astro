@@ -1,14 +1,13 @@
 ---
-import { isBefore, sub } from "date-fns";
-
 interface Props {
   date: Date;
 }
 
 const { date } = Astro.props;
 
-const twoYearsAgo = sub(new Date(), { years: 2 });
-const isOutdated = isBefore(new Date(date), twoYearsAgo);
+const twoYearsAgo = new Date();
+twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+const isOutdated = new Date(date) < twoYearsAgo;
 ---
 
 {

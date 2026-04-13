@@ -8,6 +8,7 @@ import Links from "../../components/Links.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
+
   return posts.map((post) => ({
     params: { slug: post.data.slug },
     props: { post },

@@ -1,6 +1,4 @@
 ---
-import { format } from "date-fns";
-
 interface Props {
   date: Date;
   class?: string;
@@ -9,6 +7,6 @@ interface Props {
 const { date, class: className } = Astro.props;
 ---
 
-<time datetime={format(date, "yyyy-MM-dd")} class={className}>
-  {format(date, "MMMM d, yyyy")}
+<time datetime={date.toISOString()} class={className}>
+  {date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
 </time>

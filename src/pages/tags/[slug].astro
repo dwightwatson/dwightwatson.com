@@ -5,9 +5,7 @@ import Post from "../../components/Post.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
-  const tags = [
-    ...new Set(posts.flatMap((post) => post.data.tags ?? [])),
-  ];
+  const tags = [...new Set(posts.flatMap((post) => post.data.tags ?? []))];
 
   return tags.map((tag) => ({
     params: { slug: tag },
@@ -17,9 +15,9 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.props;
 
-const posts = (await getCollection("posts"))
-  .filter((post) => post.data.tags?.includes(tag))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const posts = (
+  await getCollection("posts", ({ data }) => data.tags?.includes(tag))
+).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 const tagHeader = `${posts.length} post${posts.length === 1 ? "" : "s"}`;
 ---
