@@ -1,0 +1,65 @@
+---
+title: Serializable classes in Laravel 13
+slug: serializable-classes-in-laravel-13
+date: 2026-03-20
+tags:
+  - laravel
+---
+
+# Laravel returning a 401 instead of redirecting to login
+
+After upgrading to [Laravel v13.4.0](https://github.com/laravel/framework/releases/tag/v13.4.0) my test suite broke - simple tests that ensured that unauthenticated users would be redirected to the login path were instead returning a HTTP 401 response.
+
+```php
+public function test_does_not_display_search_for_guest(): void
+{
+    $this->get('/blog/search?q=title')
+        ->assertRedirect('/login');
+}
+```
+```
+44) Tests\Feature\Posts\SearchesTest::test_does_not_display_search_for_guest
+Expected response status code [201, 301, 302, 303, 307, 308] but received 401.
+Failed asserting that false is true.
+
+/Users/dwight/Sites/secret-project/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/Users/dwight/Sites/secret-project/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:201
+/Users/dwight/Sites/secret-project/tests/Feature/Posts/SearchesTest.php:30
+```
+
+I discovered the specific change was [this PR which adjusts how `redirectGuestsTo` works](https://github.com/laravel/framework/pull/59526). However I don't use `redirectGuestsTo` in my project so it was an unexpected failure. I did use `redirectUsersTo` however:
+
+```php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withMiddleware(function (Middleware $middleware) {
+    
+        $middleware->redirectUsersTo(fn () => route('dashboards.show'));
+        
+    });
+```
+
+It seemed the new change affected using `redirectUsersTo` in isolation, so the simplest fix is to also add `redirectGuestsTo`:
+
+```php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withMiddleware(function (Middleware $middleware) {
+    
+        $middleware->redirectUsersTo(fn () => route('dashboards.show'));
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        
+    });
+```
+
+Alternatively, you can use the simple syntax of `redirectTo`:
+
+```php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withMiddleware(function (Middleware $middleware) {
+        
+        $middleware->redirectTo(
+            guests: fn () => route('login'),
+            users: fn () => route('dashboards.show'),
+        );
+       
+    });
+```
