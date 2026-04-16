@@ -21,7 +21,9 @@ const { Content } = await render(post);
 
 <Base title={post.data.title} description={post.body?.substring(0, 100)}>
   <div class="mb-4">
-    <h1 class="font-serif text-4xl break-words">{post.data.title}</h1>
+    <h1 class="font-serif text-4xl break-words" transition:name={`${post.data.slug}`}>
+      {post.data.title}
+    </h1>
     <DateComponent date={post.data.date} class="text-sm" />
   </div>
 

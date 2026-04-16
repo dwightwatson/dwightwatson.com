@@ -23,11 +23,11 @@ const isHome = pathname === "/";
     {
       isHome ? (
         <h1 class="font-serif text-4xl">
-          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300">Dwight Watson</a>
+          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300" transition:name="author">Dwight Watson</a>
         </h1>
       ) : (
         <h3 class="font-serif text-xl">
-          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300">Dwight Watson</a>
+          <a href="/" class="text-cyan-600 hover:underline decoration-cyan-300" transition:name="author">Dwight Watson</a>
         </h3>
       )
     }

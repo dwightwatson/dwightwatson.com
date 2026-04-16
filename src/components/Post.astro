@@ -11,6 +11,7 @@ const { post } = Astro.props;
     <a
       class="font-serif text-2xl text-cyan-700 hover:underline decoration-cyan-300 break-words"
       href={`/posts/${post.data.slug}`}
+      transition:name={`${post.data.slug}`}
     >
       {post.data.title}
     </a>

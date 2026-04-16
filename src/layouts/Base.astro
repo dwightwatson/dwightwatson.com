@@ -1,5 +1,6 @@
 ---
 import { Font } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 
@@ -20,6 +21,7 @@ const { title, description } = Astro.props;
     <link rel="icon" href="/tsunami.png" type="image/png" />
     <Font cssVariable="--font-sans" preload />
     <Font cssVariable="--font-serif" preload />
+    <ClientRouter />
 
     <script
       is:inline
