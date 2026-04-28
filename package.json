@@ -14,7 +14,7 @@
     "@fontsource/atkinson-hyperlegible": "^5.0.0",
     "@fontsource/league-spartan": "^5.0.0",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.0",
+    "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.9",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.2",
