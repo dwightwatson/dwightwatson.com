@@ -1,0 +1,62 @@
+---
+title: Optional authentication with Laravel
+slug: optional-authentication-with-laravel
+date: 2026-05-05
+tags:
+  - laravel
+---
+
+While implementing an API with Laravel we had a use-case for routes that didn't require authentication, but could benefit from knowing whether a user was present. For example: persisting a search query to a user's history so they can access it again easily. However, Laravel's `auth` middleware will prevent unauthenticated requests from continuing - web requests are redirected to the login form and JSON requests receive a 401 response.
+
+A really simple way to implement this is to extend the built-in `Authenticate` middleware but stub out the `unauthenticated` method so that the request may continue.
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Http\Request;
+
+class OptionalAuthenticate extends Authenticate
+{
+    /**
+     * Handle an unauthenticated user.
+     *
+     * @param  Request  $request
+     * @return void
+     *
+     * @throws AuthenticationException
+     */
+    protected function unauthenticated($request, array $guards)
+    {
+        //
+    }
+}
+```
+
+You can optionally register the middleware alias in `bootstrap/app.php`:
+
+```php
+use App\Http\Middleware\OptionalAuthenticate::class;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Middleware;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withMiddleware(function (Middleware $middleware) {
+        //
+
+        $middleware->alias([
+            'auth.optional' => OptionalAuthenticate::class,
+        ]);
+    });
+```
+
+And finally use it as you would the regular `auth` middleware, including passing the guard as an argument:
+
+```php
+Route::middleware(['auth.optional:sanctum'])->group(function () {
+    //
+});
+```
