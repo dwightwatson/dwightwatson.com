@@ -1,0 +1,25 @@
+---
+title: Laravel Nova on Laravel Cloud
+slug: laravel-nova-on-laravel-cloud
+date: 2026-05-14
+tags:
+  - laravel nova
+  - laravel cloud
+---
+
+After moving an existing site to [Laravel Cloud](https://laravel.com/cloud) I immediately ran into an issue when trying to access Nova:
+
+```
+Illuminate\Foundation\MixManifestNotFoundException: Mix manifest not found at: /var/www/html/public/vendor/nova/mix-manifest.json
+```
+
+I have seen this issue before - I know I needed to publish Nova's assets on deployment and I forgot to bring it over. So I added the publish command to `Deploy commands` on Laravel Cloud but the issue persisted.
+
+It turns out on Laravel Cloud you need to add it to your `Build commands` instead, so that the assets are published during the build process.
+
+```sh
+composer install --no-dev
+php artisan nova:publish
+```
+
+Obvious in hindsight, but I was confused for a while and couldn't find anything online about it so I thought I'd share my solution.
