@@ -1,0 +1,51 @@
+---
+title: Using Planetscale replicas with Laravel
+slug: using-planetscale-replicas-with-laravel
+date: 2026-05-19
+tags:
+  - laravel
+  - planetscale
+---
+
+When deploying a new Postgres database with Planetscale the default configuration includes one primary database and two replica databases. These replica databases sit there to fill in for the primary database should it go down, where one of them can be promoted to primary to take over. However, you can also take advantage of these read-only replicas to reduce the load on the primary database by spreading your load over them.
+
+Planetscale uses the connection username to determine whether the query should go to the priamry or a replica database. The [convention is to suffix `|replica` to the username](https://planetscale.com/docs/postgres/scaling/replicas#how-to-query-postgres-replicas) for this to take place. You can use Laravel's environment variables to create an additional username that includes the suffix.
+
+```
+DB_USERNAME=pscale_username
+DB_REPLICA_USERNAME="${DB_USERNAME}|replica"
+```
+
+Next, you need to adjust the database configuration to let Laravel know which connections to use for reading and writing. This use case is a little tricker than usual, where you might just use a different host name for read or write conenctions, and instead need to use different credentials. You can provide an array of credentials to the `read` key to override the default credentials. In this example, I provide the replica username twice because there are two replicas. Planetscale will automatically share the load between the two - not perfectly balanced - but good enough. You can choose to add more or less depending on how much you want to spread the load.
+
+```php
+'pgsql' => [
+    'driver' => 'pgsql',
+    'url' => env('DATABASE_URL'),
+    'read' => [
+        [
+            'username' => env('DB_USERNAME'),
+        ],
+        [
+            'username' => env('DB_REPLICA_USERNAME', env('DB_USERNAME')),
+        ],
+        [
+            'username' => env('DB_REPLICA_USERNAME', env('DB_USERNAME')),
+        ],
+    ],
+    'write' => [
+        'username' => env('DB_USERNAME'),
+    ],
+    'host' => env('DB_HOST', '127.0.0.1'),
+    'port' => env('DB_PORT', '5432'),
+    'database' => env('DB_DATABASE', 'laravel'),
+    'username' => env('DB_USERNAME', 'root'),
+    'password' => env('DB_PASSWORD', ''),
+    'charset' => env('DB_CHARSET', 'utf8'),
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'search_path' => 'public',
+    'sslmode' => env('DB_SSLMODE', 'prefer'),
+    'sticky' => true,
+],
+```
