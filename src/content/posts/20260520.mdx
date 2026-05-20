@@ -1,13 +1,13 @@
 ---
-title: Migrating from Laravel Vapor to Laravel Cloud
+title: Migrating from Heroku to Laravel Cloud
 slug: migrating-from-heroku-to-laravel-cloud
 date: 2026-05-20
 tags:
-  - laravel-vapor
+  - heroku
   - laravel-cloud
 ---
 
-When we first starting building Roomies on Laravel, I had just come from building a Rails app that was deployed on Heroku. At that time Heroku was a great option: it let you focus on your code and handled everything else. However, Heroku hasn’t kept up with modern development and it’s holding back Laravel apps.
+When we first started building Roomies on Laravel, I had just come from building a Rails app that was deployed on Heroku. At that time Heroku was a great option: it let you focus on your code and handled everything else. However, Heroku hasn’t kept up with modern development and it’s holding back Laravel apps.
 
 ## The motivation
 
@@ -41,9 +41,9 @@ Another option is the [fantastic migration utility from Planetscale](https://pla
 
 This means you can keep your app running while the databases get in sync and significantly minimise downtime as part of your migration. When the databases are in sync you can issue the command to lock the Heroku database and point your app to Planetscale.
 
-This is how we chose to migrate Roomies. We wanted to avoid the downtime of a lengthy migration and were impressed with PLanetscale’s Postgres offering. Our spend on databases has reduced significantly and the performance is better and stable.
+This is how we chose to migrate Roomies. We wanted to avoid the downtime of a lengthy migration and were impressed with Planetscale’s Postgres offering. Our spend on databases has reduced significantly and the performance is better and stable.
 
-### Migrating from Heroku dynos
+## Migrating from Heroku dynos
 
 Arguably this is the simpler part of the process - getting your data moved safely is infinitely more stressful. You can start getting your app running on Laravel Cloud like a normal Laravel app and making sure it works.
 
@@ -59,7 +59,7 @@ There are a few things worth considering as part of the move.
 
 #### Sessions
 
-Unless you’re using the `database` driver or the `cookie` driver your users may be forced to login again. If you stored sessions using the `file` or `redis` drivers Laravel Cloud won’t have access to them
+Unless you’re using the `database` driver or the `cookie` driver your users may be forced to log in again. If you stored sessions using the `file` or `redis` drivers Laravel Cloud won’t have access to them.
 
 #### Caches
 
@@ -75,7 +75,7 @@ It’s not documented clearly, but you can use [Laravel Horizon](https://github.
 
 Cloud is introducing a fully managed queue solution soon which will probably be a more attractive option going forward.
 
-### Aftermath
+## Aftermath
  
 We’re very happy to have completed the Roomies migration. No matter how you approach these sorts of challenges they are stressful.
 
