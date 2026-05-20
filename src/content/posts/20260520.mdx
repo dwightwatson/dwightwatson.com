@@ -1,0 +1,86 @@
+---
+title: Migrating from Heroku to Laravel Cloud
+slug: migrating-from-heroku-to-laravel-cloud
+date: 2026-05-20
+tags:
+  - heroku
+  - laravel-cloud
+---
+
+When we first started building Roomies on Laravel, I had just come from building a Rails app that was deployed on Heroku. At that time Heroku was a great option: it let you focus on your code and handled everything else. However, Heroku hasn’t kept up with modern development and it’s holding back Laravel apps.
+
+## The motivation
+
+It’s no secret that Heroku has been lagging for a while, with the [“sustainable engineering model”](https://www.heroku.com/blog/an-update-on-heroku) that left a lot of developers concerned about its future. 
+
+As Roomies grew we found ourselves running into issues with request queueing, database performance choking up, and follower databases falling behind and never catching up. It led to multiple events where we had to drop everything and restore infrastructure.
+
+In addition, as Laravel continued to develop we were finding that we couldn’t take advantage of new features while using Heroku:
+
+* [Heroku’s scheduler](https://devcenter.heroku.com/articles/scheduler) only runs every 10 minutes, when Laravel’s scheduler is designed to be called every minute,
+* [Laravel Octane](https://github.com/laravel/octane) offers the ability to improve app performance, but we couldn’t get it running on Heroku, and
+* [Laravel Nightwatch](https://nightwatch.laravel.com) provides tailored analytics but seemed incompatible with Heroku’s dyno model.
+
+We did consider [Laravel Forge](https://laravel.com/forge) and [Laravel Vapor](https://vapor.laravel.com/), but we preferred a fully managed solution to fill the void. As soon as [Laravel Cloud](https://laravel.com/cloud) was announced we started thinking about how we were going to make the move.
+
+## Migrating from Heroku Postgres
+
+Heroku’s Postgres implementation doesn’t provide logical replication (amongst other things) which makes it quite difficult to migrate your data out. The most common option is to perform a `pg_dump`/`pg_restore` which results in some downtime, but there is an alternative.
+
+### `pg_dump`/`pg_restore`
+
+Heroku has documentation on how to [capture a database backup and then download it](https://devcenter.heroku.com/articles/heroku-postgres-import-export#export) or use `pg_dump` directly.
+
+Depending on the size of your database this can become a lengthy process and mean problematic downtime for your app. For our use-case with ~125GB of data we were looking at about 6 hours of downtime.
+
+Neon has documentation on how you can [use Heroku’s `pg:pull` to effectively `pg_dump` and `pg_restore` to another database](https://neon.com/docs/import/migrate-from-heroku).
+
+### Planetscale’s Heroku migrator
+
+Another option is the [fantastic migration utility from Planetscale](https://planetscale.com/docs/postgres/imports/heroku). It uses a custom Heroku app that connects to your Heroku database and your Planetscale database, copies all the data across and then syncs updates across.
+
+This means you can keep your app running while the databases get in sync and significantly minimise downtime as part of your migration. When the databases are in sync you can issue the command to lock the Heroku database and point your app to Planetscale.
+
+This is how we chose to migrate Roomies. We wanted to avoid the downtime of a lengthy migration and were impressed with Planetscale’s Postgres offering. Our spend on databases has reduced significantly and the performance is better and stable.
+
+## Migrating from Heroku dynos
+
+Arguably this is the simpler part of the process - getting your data moved safely is infinitely more stressful. You can start getting your app running on Laravel Cloud like a normal Laravel app and making sure it works.
+
+We had Roomies deploying to a stack on Laravel Cloud for months while learning more about the platform and getting things ready. Because Heroku and Laravel Cloud are both in `us-east-1` we set the `DATABASE_URL` environment variable to the Heroku database and it worked fine.
+
+Once your app is running properly on Cloud it’s simply a matter of making sure you have your compute set to the right level, your queues running and then adding the domain to the stack. Enable maintenance mode on Heroku so it stops serving requests and then update your DNS to point to Cloud. We found that it changed over in under a minute.
+
+```
+heroku maintenance:on --app=roomies-production
+```
+
+There are a few things worth considering as part of the move.
+
+#### Sessions
+
+Unless you’re using the `database` driver or the `cookie` driver your users may be forced to log in again. If you stored sessions using the `file` or `redis` drivers Laravel Cloud won’t have access to them.
+
+#### Caches
+
+Unless you’re using the `database` driver your caches on Cloud are going to be fresh and take some time to regenerate. Consider the performance implications of this new burst of traffic on your app. 
+
+Laravel’s Valkey provides a tonne more storage than Heroku at the same price point so it’s easy to take advantage of a larger cache or scale down. Remember you can also configure the cache to lock up if it is full or automatically delete older cache keys.
+
+#### Queues
+
+Unless you’re using the `database` driver you’ll want to let your Heroku worker clear out the queue before you turn it off.
+
+It’s not documented clearly, but you can use [Laravel Horizon](https://github.com/laravel/horizon) with Cloud by adding a worker cluster and creating a custom background process that runs `php artisan horizon`.
+
+Cloud is introducing a fully managed queue solution soon which will probably be a more attractive option going forward.
+
+## Aftermath
+ 
+We’re very happy to have completed the Roomies migration. No matter how you approach these sorts of challenges they are stressful.
+
+Planetscale helped us get our data out of Heroku and provides a performant, highly available stack at much improved cost. I am looking forward to learning more about their PgBouncer connection pooling and seeing how it can benefit us further. I also [wrote about how to take advantage of Planetscale replicas with Laravel](https://www.dwightwatson.com/posts/using-planetscale-replicas-with-laravel).
+
+Laravel Cloud has made managing infrastructure a joy again. It feels great to have a platform that gives us full access to the Laravel ecosystem and works out of the box. The cost of the compute is a fraction of what we were paying, it’s so nice to have a scheduler that actually runs when it’s meant to, and it makes it so much easier to ship faster.
+
+Also, within half an hour of getting Nightwatch up and running we found two seriously painful N+1 queries on some of our highest traffic pages. Paid for itself.
