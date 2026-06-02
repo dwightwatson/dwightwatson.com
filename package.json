@@ -10,7 +10,7 @@
   "dependencies": {
     "@astrojs/mdx": "^6.0.1",
     "@astrojs/rss": "^4.0.18",
-    "@astrojs/sitemap": "^3.7.0",
+    "@astrojs/sitemap": "^3.7.3",
     "@fontsource/atkinson-hyperlegible": "^5.0.0",
     "@fontsource/league-spartan": "^5.0.0",
     "@tailwindcss/typography": "^0.5.19",
