@@ -13,7 +13,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource/atkinson-hyperlegible": "^5.0.0",
     "@fontsource/league-spartan": "^5.0.0",
-    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.1.0",
     "astro": "^6.4.2",
     "sharp": "^0.34.5",
