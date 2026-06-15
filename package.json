@@ -15,7 +15,7 @@
     "@fontsource/league-spartan": "^5.0.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.1.0",
-    "astro": "^6.4.4",
+    "astro": "^6.4.7",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.3",
     "typescript": "^5.9.0"
