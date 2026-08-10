@@ -4,11 +4,10 @@ import me from "../assets/dwight-watson.jpg";
 import Links from "./Links.astro";
 
 interface Props {
-  pathname: string;
+  isHome: boolean;
 }
 
-const { pathname } = Astro.props;
-const isHome = pathname === "/";
+const { isHome } = Astro.props;
 
 ---
 

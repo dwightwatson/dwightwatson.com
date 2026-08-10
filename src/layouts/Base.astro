@@ -7,9 +7,10 @@ import Header from "../components/Header.astro";
 interface Props {
   title: string;
   description?: string;
+  isHome?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, isHome = false } = Astro.props;
 ---
 
 <html lang="en" class="bg-white text-black">
@@ -41,7 +42,7 @@ const { title, description } = Astro.props;
   >
     <div class="flex flex-col lg:flex-row gap-12 lg:gap-24">
       <header class="lg:sticky top-12 h-fit">
-        <Header pathname={Astro.url.pathname} />
+        <Header isHome={isHome} />
       </header>
 
       <main class="flex-1 max-w-prose">
