@@ -4,7 +4,7 @@ slug: testing-rails-redirect_back-with-rspec
 date: 2017-07-17
 tags:
   - rspec
-  - ruby on rails
+  - ruby-on-rails
 ---
 
 Rails has a handy redirect method called `redirect_back(fallback_location:)` which replaces the old `redirect_to :back` syntax. It's improved now because it gracefully handles the case where there is no referrer and allows you to indicate where the visitor should be sent to. The only issue is there's no testing support for it out of the box.
