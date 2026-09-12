@@ -1,0 +1,105 @@
+---
+title: Using PostHog with Laravel Events
+slug: using-posthog-with-laravel-events
+date: 2026-09-12
+tags:
+  - posthot
+  - laravel
+---
+
+Recently I have become more focused on understanding the customer journey and funnels on Roomies. It is not something I have been involved with much before. With previous projects I have experimented with Mixpanel and Optimizely - probably a few other tools along the way as well - but I did not have much success. I did not think enough about what I wanted to learn and what information I needed to collect to better uncover that.
+
+Over the last couple of years I've heard a lot of positivity about [PostHog](https://posthog.com), but in my head I had put it in the same basket as "not for me". However I have now decided to actually give it a proper go - to spend the time to understand the product, collect the data that I need and to try and make meaningful improvements that will be better for our customers and the business.
+
+PostHog has a [really neat wizard feature it suggests during onboarding](https://github.com/PostHog/wizard). It scans your app and tries to identify events that are worth tracking. It then generates code to start sending these events to PostHog, and preparing dashboards in the UI to visualize the data. However the code it generates is noisy - injecting classes into controller actions all over the place - and it didn't feel very Laravel-y.
+
+So, I kept the events but decided to use Laravel's built-in [event dispatching](https://laravel.com/framework/docs/events). I would simply dispatch the relevant events when relevant and and use event listeners to forward them to PostHog. It means I can keep the events generic and separate the concern of tracking completely.
+
+```php
+use App\Events\Rooms\RoomCreated;
+
+$room = $user->rooms()->create($request->validated());
+
+RoomCreated::dispatch($room);
+```
+
+The events that needed to go to PostHog would implement a basic contract which clearly states the intention.
+
+```php
+namespace App\Contracts;
+
+use App\Support\Analytics\PostHog;
+
+interface SendsToPostHog
+{
+    /**
+     * Get the event to capture in PostHog.
+     */
+    public function toPostHog(): PostHog;
+}
+```
+
+The contract is important because it means we can choose to listen for these evants specifically. I created a very small DTO that will wrap up the relevant details for my use-case. The simplest example is the event, the distinct identifier and then some metadata.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Events\Rooms;
+
+use App\Contracts\SendsToPostHog;
+use App\Events\Event;
+use App\Models\Room;
+use App\Support\Analytics\PostHog;
+
+class RoomCreated extends Event implements SendsToPostHog
+{
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(protected Room $room)
+    {
+        //
+    }
+
+
+    /**
+     * Get the event to capture in PostHog.
+     */
+    public function toPostHog(): PostHog
+    {
+        return new PostHog('rooms.created', (string) $this->room->user_id, [
+            'country' => $this->room->location->country,
+        ]);
+    }
+}
+```
+
+Finally, register a listener that is scoped only to the `SendsToPostHog` contract. Then you can collect the event data and pass it to a job, so it can run in the background without affecting the user experience.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use App\Contracts\SendsToPostHog;
+use App\Jobs\Events\Track;
+
+class SendToPostHog
+{
+    /**
+     * Capture the event in PostHog.
+     */
+    public function handle(SendsToPostHog $event): void
+    {
+        $posthog = $event->toPostHog();
+
+        Track::dispatch($posthog->name, $posthog->distinctId, $posthog->properties);
+    }
+}
+```
+
+I did not include the support `PostHog` DTO or the `Track` job because I think these will change depending on what sort of data you intend to collect. The `Track` job literally just calls `PostHog::capture` under the hood and the benefit is that it is queued to run later. I think the beauty is in that you can keep your controllers (or actions, or other app code) agnostic to whatever application tracking you're using - just dispatch events and then use a listener to ship off as you need.
