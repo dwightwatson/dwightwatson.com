@@ -1,0 +1,61 @@
+---
+title: Using AWS RDS with Laravel Cloud
+slug: using-aws-rds-with-laravel-cloud
+date: 2026-09-22
+tags:
+  - aws
+  - rds
+  - laravel-cloud
+---
+
+When deciding to move [StudentVIP.com.au](https://studentvip.com.au) from AWS to Laravel Cloud, I considered whether it was necessary to move the database as well. The database for StudentVIP is managed by AWS RDS and has been running in that configuration for over a decade and worked fine. I figured if I could get away with just moving the compute to Laravel Cloud and keep the database on RDS, I could avoid downtime and also retain the ability to roll back if there were issues.
+
+[Laravel Cloud does support AWS RDS](https://laravel.com/cloud/docs/private-cloud/rds) where they will run the database for you, but only on the Private Cloud offering. They also offer [VPC Peering](https://laravel.com/cloud/docs/private-cloud/private-networking) which could allow you to connect to your existing database privately but that's also only on Private Cloud. This project was not going to run on Private Cloud so I decided to investigate what it would be like without.
+
+## Configuring AWS RDS for public access
+
+For Laravel Cloud to access your RDS database over the public internet, you need to make two changes:
+
+1. Make a Laravel Cloud security group
+
+   Find the IP addresses that [Laravel Cloud will use from your region](https://laravel.com/cloud/docs/network#ip-addresses). Remember that you want your RDS database and Laravel Cloud stack to be running in the sam region.
+
+   In EC2 under `Network & Security` -> `Security Groups` create a new security group called `Laravel Cloud`. For each of the IP addresses listed, add an inbound rule that allows MySQL/Aurora (port 3306). 
+
+   You may need to append `/32` after each IP address for it to accept the block.
+
+2. Make the modifications to your RDS database
+
+   Press `Modify` on your database and under `Connectivity` add your new security group.
+
+   Under `Connectivity` -> `Additional configuration` select `Publicly accessible`.
+
+With these changes applied your RDS database should now be accessible from Laravel Cloud. Put your credentials into your Cloud project and deploy and it should work just as you expect.
+
+In regards to the IP addresses in the security group, there are some things to keep in mind:
+
+1. The IP addresses that Laravel Cloud uses can change - be aware of that and alert to email notifications about changes that are coming. If you are not prepared you could cause some downtime. Laravel Cloud does [provide programmatic access to their IP addresses](https://laravel.com/cloud/docs/network#programmatic-access) if you wanted to go as far to automate it.
+
+2. You could choose to forgo allowing IP address blocks with a security group if you wanted to keep it real simple, but that is a decision for you to make and understand the implications of doing so.
+
+## Reviewing performance
+
+I did expect there would be some performance considerations moving my app from EC2 -> RDS in the same VPC to Laravel Cloud -> RDS but I was pleasantly surprised to see... not much difference. I ran a number of side by side tests and did not find any consistent irregularities. I suspect there must be some internal smarts in AWS that are optimizing the connection.
+
+### EC2 -> RDS
+
+| Query | Runs | Min ms | Median ms | Max ms |   
+| --- | --- | --- | --- | --- |                                    
+| Ping | 30 | 2.19 | 2.31 | 2.52 |
+| Find user by id | 30 | 2.72 | 2.89 | 3.29 |
+| Find user by email | 30 | 2.71 | 2.95 | 9.98 |
+
+### Laravel Cloud -> RDS
+
+| Query | Runs | Min ms | Median ms | Max ms |                     
+| --- | --- | --- | --- | --- |                                    
+| Ping | 30 | 2.11 | 2.20 | 2.78 |                                 
+| Find user by id | 30 | 2.71 | 2.82 | 3.39 |                      
+| Find user by email | 30 | 2.64 | 2.79 | 2.93 |
+
+Either way, this gave me enough confidence to continue with the migration as-is. The app was migrated to Laravel Cloud still using the RDS database and it feels just as snappy as it did before.
