@@ -1,0 +1,77 @@
+---
+title: Migrating from Laravel Forge to Laravel Cloud
+slug: migrating-from-laravel-forge-to-laravel-cloud
+date: 2026-09-23
+tags:
+  - aws
+  - forge
+  - envoyer
+  - laravel-cloud
+---
+
+Recently I migrated my apps that ran on Laravel Forge over to Laravel Cloud. These apps were running on AWS, backed by a range of services including ALB for load balancing, Elasticache for caching, SQS for queues and RDS for databases. These apps have been managed by Forge and deployed with Envoyer for years without issue.
+
+Slowly, I've been migrating many of my Laravel projects over to Laravel Cloud. I started with [migrating my Laravel Vapor apps](posts/migrating-from-laravel-vapor-to-laravel-cloud), and later [migrating my Heroku apps](posts/migrating-from-heroku-to-laravel-cloud). The motivation for wanting to migrate away from Laravel Forge was really to give up the responsibility of managing infrastructure. Using Forge together with Envoyer taught me a lot about using AWS to provision servers, look after VPCs and configure load balancers. I am grateful for what I got to learn over the years while still leaving the actual PHP management to Forge.
+
+Over time Forge continued to add features that made the way I used it deviate from how it was intended to be used. For example, Forge added it's own support for provisioning load balancers after I had been using ELB (Elastic Load Balancers) followed by ALB (Application Load Balancers). Forge improved the ability to upgrade the versions of PHP and Node without needing to create new servers, and added built-in support for running Horizon and Reverb. However, Cloud can take care of all of that automatically; load balancing with autoscaling, managed queues and a single click to update PHP or Node versions.
+
+## Configuration
+
+First, copy over your environment variables from your Forge server to Cloud. Most importantly retain `APP_KEY` to keep encryption working. Go through your configuration and make note of the things that need to change or can be removed. Laravel Cloud will inject certain environment variables in by default (and it tells you when it does this).
+
+* Laravel Cloud defaults with `SESSION_DRIVER=cookie`, which you should override if you use a different driver. 
+* Cache/Valkey credentials are added automatically when you attach a cache cluster (including `CACHE_DRIVER`). Cloud does note that if you have are using a cache with your app it may be worth using as your session driver also.
+* `LOG_CHANNEL` is automatically configured for Cloud, and you can either link Nightwatch in the UI or update the logging stack to also report to your error tracker: `LOG_STACK=laravel-cloud-socket,sentry`.
+* If you decide to use managed queues Cloud will automatically inject the connection requirements, and you only need to add a managed queue for each queue in your app.
+
+With this you should be able to deploy your app and give it a quick sanity check. You can then experiment with doing database migrations over to Cloud to get an idea of the time required and also the issues you may run into along the way.
+
+## Database
+
+I recommend doing some test runs before you to the final switch, but when you are ready remember to *put the Forge app into maintenance mode*, or call the command yourself.
+
+```sh
+php artisan down --secret=hunter2
+```
+
+Download a copy of your database - obviously the more data you have the longer this takes.
+
+```
+mysqldump \
+    --host=SOURCE_HOST \
+    --port=3306 \
+    --user=SOURCE_USERNAME \
+    --password \
+    --compress \
+    --routines \
+    --single-transaction \
+    --lock-tables=false \
+    --set-gtid-purged=OFF \
+    --no-tablespaces \
+    SOURCE_DATABASE > dump.sql
+```
+
+Then you can upload it straight to a fresh database instance on Cloud. Cloud makes it easy to make a database publicly available for this step, and you can toggle this off when the import is complete. By default the database name is `production`.
+
+```
+mysql \
+    --host=LARAVEL_CLOUD_HOST \
+    --user=LARAVEL_CLOUD_USERNAME \
+    --password \
+    production < dump.sql
+```
+
+If you set a secret when going into maintenance mode this is a good time to do a final check that it's imported and looking right. You may also want to run test SQL that checks the table counts or `MAX(id)`s match what you expect. Then you can switch the DNS over.
+
+## Domains
+
+I found the process of enabling domains on Cloud easy and often very quick, however I did run into a few issues where it just wouldn't detect the right DNS records and verify. Depending on the configuration I found I would need to switch the domain between an `A 103.133.1.1` record and a `CNAME to.laravel.cloud` record. (It is possible you get different IP addresses when doing yours, but that is the IP address I saw consistently). After getting a domain verified on Cloud I often switched it back to `CNAME to.laravel.cloud` as it felt more future-proof.
+
+## Cleaning up
+
+It's a good idea to leave your Forge servers running (albeit in maintenance mode) for a little bit longer as a fallback. Spend some time monitoring to ensure things are all working as you expect:
+
+* User sessions have transferred across,
+* Emails are going out,
+* Queues are being processed, and
+* Errors are being received.
