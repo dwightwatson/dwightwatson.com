@@ -1,0 +1,137 @@
+---
+title: Discovering morphWith, replacing HasNone
+date: 2026-11-10
+tags:
+  - laravel
+---
+
+When I started building Roomies I wanted to achieve search results that included rooms and profiles together. To do this I used a `listings` table that has a morph to `listable`.
+
+```php
+public function show(Location $location) {
+    $listings = $location->listings()->with('listable')->simplePaginate();
+    
+    //
+}
+```
+
+A complication of this is that the relationships that I wanted to display for rooms and profiles differed. For example a room may also have a `place` (it’s broader location: think city or state), while a profile has `people` (others who are searching with you).
+
+One solution would be to bake all the data required for search results into the `listings` table. However this did not seem elegant to me: it would be harder to make changes to the information shown without re-indexing all listings, it risked the data getting out of sync with the source of truth and it felt brittle.
+
+## Implementing `HasNone`
+
+The solution I went with was to [take inspiration from the Rails `none` relation](https://guides.rubyonrails.org/active_record_querying.html#null-relation) by implementing `HasNone` and letting each model have “relationships” that would not load records. `HasNone` extends regular Laravel relationships .
+
+```php
+namespace App\Support;
+
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Relation;
+
+class HasNone extends Relation
+{
+    /**
+     * Set the base constraints on the relation query.
+     *
+     * @return void
+     */
+    public function addConstraints()
+    {
+        //
+    }
+
+    /**
+     * Set the constraints for an eager load of the relation.
+     *
+     * @return void
+     */
+    public function addEagerConstraints(array $models)
+    {
+        //
+    }
+
+    /**
+     * Initialize the relation on a set of models.
+     *
+     * @param  string  $relation
+     * @return array
+     */
+    public function initRelation(array $models, $relation)
+    {
+        return $models;
+    }
+
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  string  $relation
+     * @return array
+     */
+    public function match(array $models, Collection $results, $relation)
+    {
+        return $models;
+    }
+
+    /**
+     * Get the results of the relationship.
+     *
+     * @return void
+     */
+    public function getResults()
+    {
+        //
+    }
+
+    /**
+     * Get the relationship for eager loading.
+     *
+     * @return Collection
+     */
+    public function getEager()
+    {
+        return new Collection;
+    }
+}
+```
+
+In your base model class, add a convenience method so that you can call `$this->hasNone()` like any other relationship.
+
+```php
+/**
+ * Define a one-to-none relationship.
+ */
+protected function hasNone(): HasNone
+{
+    return new HasNone($this->newQuery(), $this);
+}
+```
+
+By having the room and profile models use `hasNone` on relationships that weren’t relevant I could continue to use eager-loading even over the two morphs classes.
+
+```php
+$listings = $location->listings()
+    ->with('listable.people', 'listable.region')
+    ->simplePaginate();
+```
+
+## Discovering `morphWith`
+
+This implementation has served well in production for 8 years, until [Laracon AU 2026](https://laracon.au/) where I finally discovered [`morphWith`](https://laravel.com/framework/docs/12.x/eloquent-relationships#nested-eager-loading-morphto-relationships).
+
+Turns out [Laravel got an elegant solution to this problem in 2020](https://github.com/laravel/framework/pull/35190) and allowed me to delete my custom relationship and implement eager loading over morphed relationships out of the box.
+
+```php
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
+$listings = $location->listings()
+    ->with([
+        'listable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+            Room::class => ['place'],
+            Profile::class => ['people'],
+        ])
+    ])
+    ->simplePaginate()
+```
+
+Within the week I replaced my 8 year old `HasNone` implementation (which I was reasonably proud of) with this first-party implementation. I look forward to finding more opportunities to use `morphWith`.
